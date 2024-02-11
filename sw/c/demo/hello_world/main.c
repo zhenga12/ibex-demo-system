@@ -8,6 +8,7 @@
 #include "gpio.h"
 #include "pwm.h"
 #include "timer.h"
+#include <stdio.h>
 
 #define USE_GPIO_SHIFT_REG 0
 
@@ -35,17 +36,28 @@ int main(void) {
 
   // Reset green LEDs to having just one on
   set_outputs(GPIO_OUT, 0x10); // Bottom 4 bits are LCD control as you can see in top_artya7.sv
-
+  puts("test messgagag");
+  putchar('\n');
   // PWM variables
   uint32_t counter    = UINT8_MAX;
   uint32_t brightness = 0;
   bool ascending      = true;
   // The three least significant bits correspond to RGB, where B is the leas significant.
   uint8_t color = 7;
+  uint32_t count = 0;
+  //FILE *file_ptr;
+  //file_ptr = fopen("test.txt", "w");
+  //fprintf(file_ptr, "hello worldsadsda");
+  //fclose(file_ptr);
 
-  while (1) {
+  while (count < 20) {
     uint64_t cur_time = get_elapsed_time();
-
+    puts("Hello World! ");
+    puthex(last_elapsed_time);
+    puts("   Input Value: ");
+    uint32_t in_val = read_gpio(GPIO_IN_DBNC);
+    puthex(in_val);
+    putchar('\n');
     if (cur_time != last_elapsed_time) {
       last_elapsed_time = cur_time;
 
@@ -100,7 +112,12 @@ int main(void) {
         }
       }
     }
+    //sim_halt();
 
-    asm volatile("wfi");
+    //asm volatile("wfi");
+    count++;
+    //sim_halt();
   }
+  //sim_halt();
+  return 0;
 }
