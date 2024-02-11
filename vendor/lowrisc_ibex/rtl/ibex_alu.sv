@@ -32,6 +32,7 @@ module ibex_alu #(
   output logic              is_equal_result_o
 );
   import ibex_pkg::*;
+  //import fp_mul::*
 
   logic [31:0] operand_a_rev;
   logic [32:0] operand_b_neg;
@@ -40,6 +41,64 @@ module ibex_alu #(
   for (genvar k = 0; k < 32; k++) begin : gen_rev_operand_a
     assign operand_a_rev[k] = operand_a_i[31-k];
   end
+
+  //for complex instructions
+
+  logic [15:0] rs1_real, rs1_imag;
+  logic [15:0] rs2_real, rs2_imag;
+
+  assign rs1_real = operand_a_i[31:16];
+  assign rs1_imag = operand_a_i[15:0];
+  assign rs2_real = operand_b_i[31:16];
+  assign rs2_imag = operand_b_i[15:0];
+
+  logic [15:0] real_result, imag_result;
+  logic [31:0] complex_result;
+
+  logic [15:0] mul_real1_res;
+  logic [15:0] mul_real2_res;
+  logic [15:0] mul_imag1_res;
+  logic [15:0] mul_imag2_res;
+
+  // Multipliers for complex multiplication
+  fp_mul#(.CLAMP(0)) mul1(.a_i(rs1_real), .b_i(rs2_real), .result_o(mul_real1_res));
+  fp_mul#(.CLAMP(0)) mul2(.a_i(rs1_real), .b_i(rs2_imag), .result_o(mul_imag1_res));
+  fp_mul#(.CLAMP(0)) mul3(.a_i(rs1_imag), .b_i(rs2_real), .result_o(mul_imag2_res));
+  fp_mul#(.CLAMP(0)) mul4(.a_i(rs1_imag), .b_i(rs2_imag), .result_o(mul_real2_res));
+
+  logic [15:0] real_sq_res;
+  logic [15:0] imag_sq_res;
+
+
+  // Multpliers for complex absolute value
+  fp_mul#(.CLAMP(1)) real_sq(.a_i(rs1_real), .b_i(rs1_real), .result_o(real_sq_res));
+  fp_mul#(.CLAMP(1)) imag_sq(.a_i(rs1_imag), .b_i(rs1_imag), .result_o(imag_sq_res));
+
+
+  always_comb begin
+    complex_result = '0;
+
+    unique case (operator_i)
+      ALU_ADD_COMP: begin
+        real_result = rs1_real + rs2_real;
+        imag_result = rs1_imag + rs2_imag;
+        complex_result = {real_result,imag_result};//{bits 31-16,bits 15-0}
+      end
+      ALU_MUL_COMP: begin
+        real_result = mul_real1_res - mul_real2_res;
+        imag_result = mul_imag1_res + mul_imag2_res; 
+        complex_result = {real_result,imag_result};
+      end
+      //absolute value (squared)
+      ALU_ABS: begin
+        real_result = real_sq_res + imag_sq_res;
+        complex_result[31:16] = real_result;
+      end
+      default:;
+    endcase 
+  end
+  //assign  complex_result_o = complex_result;
+  //end of complex instructions
 
   ///////////
   // Adder //
@@ -287,7 +346,7 @@ module ibex_alu #(
           (operand_b_i[5] && shift_funnel ? shift_amt_compl[4:0] : operand_b_i[4:0]) :
           (operand_b_i[5] && shift_funnel ? operand_b_i[4:0] : shift_amt_compl[4:0]);
     end
-  end
+  end 
 
   // single-bit mode: shift
   assign shift_sbmode = (RV32B != RV32BNone) ?
@@ -1389,6 +1448,10 @@ module ibex_alu #(
       // Carry-less Multiply Operations (RV32B)
       ALU_CLMUL, ALU_CLMULR,
       ALU_CLMULH: result_o = clmul_result;
+
+      // Complex Operations
+      ALU_ADD_COMP, ALU_MUL_COMP,
+      ALU_ABS: result_o = complex_result;
 
       default: ;
     endcase

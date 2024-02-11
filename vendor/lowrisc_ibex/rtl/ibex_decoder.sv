@@ -235,6 +235,17 @@ module ibex_decoder #(
     opcode                = opcode_e'(instr[6:0]);
 
     unique case (opcode)
+      OPCODE_COMPLEX: begin //for complex calculations
+        rf_ren_a_o = 1'b1;
+        rf_ren_b_o = 1'b1;
+        rf_we = 1'b1;
+        unique case (instr[14:12])
+          3'b000,
+          3'b001,
+          3'b010: illegal_insn = 1'b0;
+          default: illegal_insn = 1'b1;
+        endcase
+      end
 
       ///////////
       // Jumps //
@@ -689,6 +700,16 @@ module ibex_decoder #(
 
     unique case (opcode_alu)
 
+      OPCODE_COMPLEX: begin
+        alu_op_a_mux_sel_o = OP_A_REG_A;
+        alu_op_b_mux_sel_o = OP_B_REG_B;
+        unique case (instr_alu[14:12])
+          3'b001:  alu_operator_o = ALU_ADD_COMP;
+          3'b000:  alu_operator_o = ALU_MUL_COMP;
+          3'b010:  alu_operator_o = ALU_ABS;
+          default: ;
+        endcase
+      end
       ///////////
       // Jumps //
       ///////////
