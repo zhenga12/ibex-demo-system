@@ -1,8 +1,8 @@
 #include "demo_system.h"
 #include "timer.h"
 
-#include "image.h"
-#include "main.h"
+//#include "image.h" //only top third of the image gets properly produced
+#include "image_47x63.h" //no issues with lower resolution
 
 #define MASK_DIM    3
 #define OFFSET      1 //offset due to 3x3 mask used for enhancement
@@ -19,9 +19,9 @@
 int dump_img_data(uint32_t grey_image[GREYSCALE_HEIGHT][GREYSCALE_WIDTH])
 {
     //puts("dumping image data: \n");
-    for (uint32_t index_row=0; index_row<GREYSCALE_WIDTH; index_row++)
+    for (uint32_t index_row=0; index_row<GREYSCALE_HEIGHT; index_row++)
     {
-        for (uint32_t index_col=0; index_col<GREYSCALE_HEIGHT; index_col++)
+        for (uint32_t index_col=0; index_col<GREYSCALE_WIDTH; index_col++)
         {
             puthex(grey_image[index_row][index_col]);
             puts(" ");
@@ -38,12 +38,11 @@ int main(void)
                                                 {{0,-1,0},
                                                 {-1,5,-1},
                                                 {0,-1,0},};
-
-    //puts("started\n");
+    puts("started\n");
     uint32_t enhanced_img[GREYSCALE_HEIGHT][GREYSCALE_WIDTH] = {{0}};
-    for (uint32_t index_row=OFFSET; index_row<GREYSCALE_HEIGHT; index_row++)
+    for (uint32_t index_row=OFFSET; index_row<GREYSCALE_HEIGHT-1; index_row++)
     {
-        for (uint32_t index_col=OFFSET; index_col<GREYSCALE_WIDTH; index_col++)
+        for (uint32_t index_col=OFFSET; index_col<GREYSCALE_WIDTH-1; index_col++)
         {
             int new_pixel = 0;
             for(uint32_t mask_row=0; mask_row<MASK_DIM; mask_row++)
@@ -52,8 +51,9 @@ int main(void)
                 for(uint32_t mask_col=0; mask_col<MASK_DIM; mask_col++)
                 {
                 //puthex(greyscale[index_row-OFFSET+mask_row][index_col-OFFSET+mask_col]);
-                //puthex(ENHANCEMENT_MASK[mask_row][mask_col]);
-                new_pixel += greyscale[index_row-OFFSET+mask_row][index_col-OFFSET+mask_col]*ENHANCEMENT_MASK[mask_row][mask_col];
+                int val = greyscale[index_row-OFFSET+mask_row][index_col-OFFSET+mask_col]*ENHANCEMENT_MASK[mask_row][mask_col];
+                //puthex(val);
+                new_pixel += val;
                 //puts(" ");
                 }
                 //puts("\n");
