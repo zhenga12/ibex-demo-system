@@ -1,3 +1,3 @@
 cd sw/c/build
-cmake ..
+cmake .. -DSIM_CTRL_OUTPUT=On #remove flag for fpga
 cd ../../..
