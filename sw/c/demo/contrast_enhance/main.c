@@ -1,8 +1,8 @@
 #include "demo_system.h"
 #include "timer.h"
 
-//#include "image.h" //only top third of the image gets properly produced
-#include "image_47x63.h" //no issues with lower resolution
+#include "image.h" 
+//#include "image_47x63.h" //no issues with lower resolution
 
 #define MASK_DIM    3
 #define OFFSET      1 //offset due to 3x3 mask used for enhancement
@@ -16,7 +16,7 @@
 *Returns: Success (0), should only have output in the log file (if enabled)
 *         might be possible to adapt to be able to dump to display
 */
-int dump_img_data(uint32_t grey_image[GREYSCALE_HEIGHT][GREYSCALE_WIDTH])
+int dump_img_data(char grey_image[GREYSCALE_HEIGHT][GREYSCALE_WIDTH])
 {
     //puts("dumping image data: \n");
     for (uint32_t index_row=0; index_row<GREYSCALE_HEIGHT; index_row++)
@@ -39,7 +39,7 @@ int main(void)
                                                 {-1,5,-1},
                                                 {0,-1,0},};
     puts("started\n");
-    uint32_t enhanced_img[GREYSCALE_HEIGHT][GREYSCALE_WIDTH] = {{0}};
+    char enhanced_img[GREYSCALE_HEIGHT][GREYSCALE_WIDTH] = {{0}};
     for (uint32_t index_row=OFFSET; index_row<GREYSCALE_HEIGHT-1; index_row++)
     {
         for (uint32_t index_col=OFFSET; index_col<GREYSCALE_WIDTH-1; index_col++)
