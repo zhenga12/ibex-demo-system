@@ -5,10 +5,15 @@ can use to compare simulated values with values produced the python script
 import numpy
 import cv2
 
+DEBUG = 1
 #adjust dimensions based on dimensions of image
 #can see issues when 94x126 image used
-WIDTH  = 47
-HEIGHT = 63
+if DEBUG:
+    WIDTH  = 137
+    HEIGHT = 183
+else:
+    WIDTH  = 47
+    HEIGHT = 63
 input_file = open("fpga_output.txt", "r")
 
 image = [];
