@@ -1,12 +1,14 @@
 #include "demo_system.h"
 #include "timer.h"
 
-#include "image.h" 
+//#include "image.h"
 //#include "image_47x63.h" //no issues with lower resolution
+#include "image_137x183.h"
 
 #define MASK_DIM    3
 #define OFFSET      1 //offset due to 3x3 mask used for enhancement
 #define DUMP_PIXELS 1
+#define MAX_PIXEL_VAL ((1 << 8) - 1)
 
 /*
 *dumps out pixel data of the image into the log file
@@ -58,9 +60,11 @@ int main(void)
                 }
                 //puts("\n");
             }
-
+            //handle underflow/overflow when storing value with 8 bits
             if (new_pixel < 0)
                 new_pixel = 0;
+            else if (new_pixel > MAX_PIXEL_VAL)
+                new_pixel = MAX_PIXEL_VAL;
             enhanced_img[index_row][index_col] = new_pixel;
             /*
             puts("done calculating pixel value: ");
