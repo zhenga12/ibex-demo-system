@@ -19,20 +19,20 @@ def to_text(img, filename="default_name.txt", format=None):
     #for copying to header file
     txt_file.write(f"#define GREYSCALE_WIDTH  {base_height}\n")
     txt_file.write(f"#define GREYSCALE_HEIGHT {base_width}\n")
-    txt_file.write("unsigned char greyscale[GREYSCALE_HEIGHT][GREYSCALE_WIDTH] = \n")
+    txt_file.write("unsigned char greyscale[GREYSCALE_HEIGHT*GREYSCALE_WIDTH] = \n")
 
     txt_file.write("{")
     #row = img.shape[0]
     #col = img.shape[1]
     
     for row in range(img.shape[0]):
-        txt_file.write("{")
+        #txt_file.write("{")
         for col in range(img.shape[1]):
             if format == "hex":
                 txt_file.write(str(hex(img[row][col]))+", ")
             else:
                 txt_file.write(str(img[row][col])+", ")
-        txt_file.write("},")
+        #txt_file.write("},")
         txt_file.write("\n")
     txt_file.write("};")
     #txt_file.write(numpy.array2string(img))
