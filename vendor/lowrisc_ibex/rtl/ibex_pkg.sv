@@ -58,6 +58,8 @@ package ibex_pkg;
 
   typedef enum logic [6:0] {
     OPCODE_LOAD     = 7'h03,
+    OPCODE_VEC0     = 7'h0b,
+    OPCODE_VEC1     = 7'h2b,
     OPCODE_MISC_MEM = 7'h0f,
     OPCODE_OP_IMM   = 7'h13,
     OPCODE_AUIPC    = 7'h17,
@@ -76,6 +78,8 @@ package ibex_pkg;
   ////////////////////
 
   typedef enum logic [6:0] {
+    VEC0_VLEN
+
     // Arithmetics
     ALU_ADD,
     ALU_SUB,
@@ -587,7 +591,15 @@ package ibex_pkg;
     CSR_MHPMCOUNTER30H = 12'hB9E,
     CSR_MHPMCOUNTER31H = 12'hB9F,
     CSR_CPUCTRLSTS     = 12'h7C0,
-    CSR_SECURESEED     = 12'h7C1
+    CSR_SECURESEED     = 12'h7C1,
+
+    // Vector CSR
+    CSR_VSTART         = 12'h008,
+    CSR_VL             = 12'hC20,
+    CSR_VTYPE          = 12'hC21,
+    CSR_VLENB          = 12'hC22
+        
+    
   } csr_num_e;
 
   // CSR pmp-related offsets

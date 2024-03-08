@@ -491,6 +491,23 @@ module ibex_top import ibex_pkg::*; #(
     );
   end
 
+    // 	VECTOR Register file
+    // TODO: Build new wire connections
+    ibex_register_file_vector vector_register_file_i (
+      .clk_i (clk),
+      .rst_ni(rst_ni),
+      .vsew(),
+      .vlmul(),
+      .        
+      .v0_addr(),
+      .v1_adrr(),
+      .        
+      .load_en(),
+      .        
+      .vreg0_o(),
+      .vreg1_o(),
+      .vreg2_o()
+    );
   ///////////////////////////////
   // Scrambling Infrastructure //
   ///////////////////////////////
