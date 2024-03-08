@@ -2,13 +2,17 @@
 #include "timer.h"
 
 //#include "image.h"
-//#include "image_47x63.h" //no issues with lower resolution
+//#include "image_47x63.h"
 #include "image_137x183.h"
 
 #define MASK_DIM    3
 #define OFFSET      1 //offset due to 3x3 mask used for enhancement
-#define DUMP_PIXELS 0
+#define DUMP_PIXELS 1
+#define MEASURE_TIME 0
 #define MAX_PIXEL_VAL ((1 << 8) - 1)
+
+#define WIDTH 400
+#define HEIGHT 600
 
 /*
 *dumps out pixel data of the image into the log file
@@ -18,14 +22,14 @@
 *Returns: Success (0), should only have output in the log file (if enabled)
 *         might be possible to adapt to be able to dump to display
 */
-int dump_img_data(char grey_image[GREYSCALE_HEIGHT][GREYSCALE_WIDTH])
+int dump_img_data(char* grey_image)
 {
     //puts("dumping image data: \n");
     for (uint32_t index_row=0; index_row<GREYSCALE_HEIGHT; index_row++)
     {
         for (uint32_t index_col=0; index_col<GREYSCALE_WIDTH; index_col++)
         {
-            puthex(grey_image[index_row][index_col]);
+            puthex(grey_image[index_row*GREYSCALE_WIDTH + index_col]);
             puts(" ");
         }
         puts("\n");
@@ -42,8 +46,7 @@ int main(void)
                                                 {-1,5,-1},
                                                 {0,-1,0},};
     //puts("started\n");
-    char enhanced_img[GREYSCALE_HEIGHT][GREYSCALE_WIDTH] = {{0}};
-
+    char enhanced_img[GREYSCALE_HEIGHT*GREYSCALE_WIDTH] = {0};
     timer_init();
     timer_enable(50000000); //clock speed (50MHz?? based on values in clk_rst_if)
     start_time = timer_read();
@@ -59,7 +62,9 @@ int main(void)
                 for(uint32_t mask_col=0; mask_col<MASK_DIM; mask_col++)
                 {
                 //puthex(greyscale[index_row-OFFSET+mask_row][index_col-OFFSET+mask_col]);
-                int val = greyscale[index_row-OFFSET+mask_row][index_col-OFFSET+mask_col]*ENHANCEMENT_MASK[mask_row][mask_col];
+
+                int val = greyscale[(index_row-OFFSET+mask_row)*GREYSCALE_WIDTH + index_col-OFFSET+mask_col] *
+                          ENHANCEMENT_MASK[mask_row][mask_col];
                 //puthex(val);
                 new_pixel += val;
                 //puts(" ");
@@ -71,7 +76,7 @@ int main(void)
                 new_pixel = 0;
             else if (new_pixel > MAX_PIXEL_VAL)
                 new_pixel = MAX_PIXEL_VAL;
-            enhanced_img[index_row][index_col] = new_pixel;
+            enhanced_img[index_row*GREYSCALE_WIDTH + index_col] = new_pixel;
             /*
             puts("done calculating pixel value: ");
             puthex(enhanced_img[index_row][index_col]);
@@ -98,11 +103,15 @@ int main(void)
     }
     end_time = timer_read();
 
-    puts("elapsed time (hex): \n\t");
-    puthex(end_time-start_time);
-    puts("\n");
-    //puts("complete\n");
+    if (MEASURE_TIME)
+    {
+        puts("elapsed time (hex): \n\t");
+        puthex(end_time-start_time);
+        puts("\n");
+    }
     if (DUMP_PIXELS)
         dump_img_data(enhanced_img);
+    //puts("complete\n");
+
     return 0;
 }
