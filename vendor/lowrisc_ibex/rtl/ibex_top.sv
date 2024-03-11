@@ -492,22 +492,28 @@ module ibex_top import ibex_pkg::*; #(
   end
 
     // 	VECTOR Register file
-    // TODO: Build new wire connections
+    // TODO: Connect wires to ALU and ID stage
     ibex_register_file_vector vector_register_file_i (
       .clk_i (clk),
       .rst_ni(rst_ni),
-      .vsew(),
-      .vlmul(),
-      .        
-      .v0_addr(),
-      .v1_adrr(),
-      .        
-      .load_en(),
-      .        
-      .vreg0_o(),
-      .vreg1_o(),
-      .vreg2_o()
+      // VCSR
+      .vsew_i(),
+      .vlmul_i(),
+      // Input data write
+      .v_wdata_i(),
+      .v_waddr_i(),
+      .v_we_i(),
+      .v_wnum(),
+      .v_load_en_i(),
+      // Output data read
+      .v_raddr_a_i(),
+      .v_rdata_a_o(),
+      .v_raddr_b_i(),
+      .v_rdata_b_o(),
+      .v_raddr_c_i(),
+      .v_rdata_c_o()
     );
+
   ///////////////////////////////
   // Scrambling Infrastructure //
   ///////////////////////////////

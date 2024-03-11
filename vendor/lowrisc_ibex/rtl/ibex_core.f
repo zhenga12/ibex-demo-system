@@ -15,3 +15,4 @@ ibex_prefetch_buffer.sv
 ibex_fetch_fifo.sv
 ibex_register_file_ff.sv
 ibex_core.sv
+ibex_register_file_vector.sv

@@ -78,8 +78,10 @@ package ibex_pkg;
   ////////////////////
 
   typedef enum logic [6:0] {
-    VEC0_VLEN
-
+    // Vectors
+    VSETVLI,
+    VADD,
+    VMUL,
     // Arithmetics
     ALU_ADD,
     ALU_SUB,
