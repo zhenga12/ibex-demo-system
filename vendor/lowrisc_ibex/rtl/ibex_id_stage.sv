@@ -170,6 +170,13 @@ module ibex_id_stage #(
   input  logic [31:0]               rf_wdata_fwd_wb_i,
   input  logic                      rf_write_wb_i,
 
+  // Vector register file read
+  output logic                      vrf_ren_a_o,
+  output logic                      vrf_ren_b_o,
+
+
+  // TODO: Probably need to add more signals for vregfile interfacing...
+
   output  logic                     en_wb_o,
   output  ibex_pkg::wb_instr_type_e instr_type_wb_o,
   output  logic                     instr_perf_count_id_o,
@@ -257,6 +264,16 @@ module ibex_id_stage #(
   logic [31:0] rf_rdata_a_fwd;
   logic [31:0] rf_rdata_b_fwd;
 
+  // Vector register file interface
+  logic        vrf_we_dec, vrf_we_raw;
+  logic        vrf_ren_a, vrf_ren_b;
+  logic        vrf_ren_a_dec, vrf_ren_b_dec;
+  // Read enables should only be asserted for valid and legal instructions
+  assign vrf_ren_a = instr_valid_i & ~instr_fetch_err_i & ~illegal_insn_o & vrf_ren_a_dec;
+  assign vrf_ren_b = instr_valid_i & ~instr_fetch_err_i & ~illegal_insn_o & vrf_ren_b_dec;
+
+  assign vrf_ren_a_o = vrf_ren_a;
+  assign vrf_ren_b_o = vrf_ren_b;
   // ALU Control
   alu_op_e     alu_operator;
   op_a_sel_e   alu_op_a_mux_sel, alu_op_a_mux_sel_dec;
@@ -476,6 +493,11 @@ module ibex_id_stage #(
     .rf_waddr_o  (rf_waddr_id_o),
     .rf_ren_a_o  (rf_ren_a_dec),
     .rf_ren_b_o  (rf_ren_b_dec),
+
+    // vector register file
+    .vrf_we_o       (vrf_we_dec),   
+    .vrf_ren_a_o    (vrf_ren_a_dec),
+    .vrf_ren_b_o    (vrf_ren_b_dec),
 
     // ALU
     .alu_operator_o    (alu_operator),
