@@ -20,7 +20,10 @@ module gpio #(
   output logic                 device_rvalid_o,
   output logic [DataWidth-1:0] device_rdata_o,
 
+/* verilator lint_off UNUSED */
   input  logic [GpiWidth-1:0] gp_i,
+/* verilator lint_on UNUSED */
+
   output logic [GpoWidth-1:0] gp_o
 );
 
@@ -35,8 +38,11 @@ module gpio #(
   logic [GpoWidth-1:0] gp_o_d;
 
   logic gp_o_wr_en;
+/* verilator lint_off UNUSED */
   logic gp_i_rd_en_d, gp_i_rd_en_q;
   logic gp_i_dbnc_rd_en_d, gp_i_dbnc_rd_en_q;
+/* verilator lint_on UNUSED */
+
 
   // Instantiate debouncers for all GP inputs.
 //  for (genvar i = 0; i < GpiWidth; i++) begin : gen_debounce
@@ -88,6 +94,22 @@ module gpio #(
   assign gp_o_wr_en        = device_req_i &  device_we_i & (reg_addr == GPIO_OUT_REG[RegAddr-1:0]);
   assign gp_i_rd_en_d      = device_req_i & ~device_we_i & (reg_addr == GPIO_IN_REG[RegAddr-1:0]);
   assign gp_i_dbnc_rd_en_d = device_req_i & ~device_we_i & (reg_addr == GPIO_IN_DBNC_REG[RegAddr-1:0]);
+
+/* verilator lint_off UNUSED */
+  logic [31:0] hc, vc;
+/* verilator lint_on UNUSED */
+  vga_sync_demo  vga_controller (
+    .clk (clk_i),
+    .reset (rst_ni),
+    .vga_si_rgb   (device_wdata_i[11:0]),
+
+    .rgb (device_rdata_o[11:0]),
+    .hsync (device_rdata_o[12]),
+    .vsync (device_rdata_o[13]),
+ 
+    .hc (hc),
+    .vc (vc)
+  );
 
   // Assign device_rdata_o according to request type.
   always_comb begin

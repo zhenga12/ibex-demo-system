@@ -1,6 +1,6 @@
 module vga_sync_demo 
    #(parameter CD= 12,
-   COUNTER_BITS= 32
+               COUNTER_BITS = 32
    )    // color depth
    (
     input  logic clk, reset,
@@ -31,7 +31,9 @@ module vga_sync_demo
    logic[COUNTER_BITS-1:0] x, y;
    logic hsync_i, vsync_i, video_on_i;
    logic hsync_reg, vsync_reg;  
+   /* verilator lint_off UNUSED */
    logic [CD-1:0] rgb_reg;  
+   /* verilator lint_on UNUSED */
 
    // body 
    // mod-4 counter to generate 25M-Hz tick
@@ -61,7 +63,7 @@ module vga_sync_demo
    // output 
    assign hsync = hsync_reg;
    assign vsync = vsync_reg;
-   assign rgb = 32'h00000FFF;
+   assign rgb = 12'hFFF; //pass rgb_reg values to output later
    assign hc = x;
    assign vc = y;
 endmodule
