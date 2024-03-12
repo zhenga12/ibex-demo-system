@@ -30,8 +30,8 @@ module gpio #(
 
   logic [RegAddr-1:0] reg_addr;
 
-  logic [2:0][GpiWidth-1:0] gp_i_q;
-  logic [GpiWidth-1:0] gp_i_dbnc;
+  //logic [2:0][GpiWidth-1:0] gp_i_q;
+  //logic [GpiWidth-1:0] gp_i_dbnc;
   logic [GpoWidth-1:0] gp_o_d;
 
   logic gp_o_wr_en;
@@ -39,32 +39,32 @@ module gpio #(
   logic gp_i_dbnc_rd_en_d, gp_i_dbnc_rd_en_q;
 
   // Instantiate debouncers for all GP inputs.
-  for (genvar i = 0; i < GpiWidth; i++) begin : gen_debounce
-    debounce #(
-      .ClkCount(500)
-    ) dbnc (
-      .clk_i,
-      .rst_ni,
-      .btn_i(gp_i_q[2][i]),
-      .btn_o(gp_i_dbnc[i])
-    );
-  end
+//  for (genvar i = 0; i < GpiWidth; i++) begin : gen_debounce
+//    debounce #(
+//      .ClkCount(500)
+//    ) dbnc (
+//      .clk_i,
+//      .rst_ni,
+//      .btn_i(gp_i_q[2][i]),
+//      .btn_o(gp_i_dbnc[i])
+//    );
+//  end
 
   always @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
-      gp_i_q            <= '0;
+      //gp_i_q            <= '0;
       gp_o              <= '0;
       device_rvalid_o   <= '0;
       gp_i_rd_en_q      <= '0;
-      gp_i_dbnc_rd_en_q <= '0;
+      //gp_i_dbnc_rd_en_q <= '0;
     end else begin
-      gp_i_q <= {gp_i_q[1:0], gp_i};
+      //gp_i_q <= {gp_i_q[1:0], gp_i};
       if (gp_o_wr_en) begin
         gp_o <= gp_o_d;
       end
       device_rvalid_o   <= device_req_i;
       gp_i_rd_en_q      <= gp_i_rd_en_d;
-      gp_i_dbnc_rd_en_q <= gp_i_dbnc_rd_en_d;
+      //gp_i_dbnc_rd_en_q <= gp_i_dbnc_rd_en_d;
     end
   end
 
@@ -91,11 +91,11 @@ module gpio #(
 
   // Assign device_rdata_o according to request type.
   always_comb begin
-    if (gp_i_dbnc_rd_en_q)
-      device_rdata_o = {{(DataWidth - GpiWidth){1'b0}}, gp_i_dbnc};
-    else if (gp_i_rd_en_q)
-      device_rdata_o = {{(DataWidth - GpiWidth){1'b0}}, gp_i_q[2]};
-    else
+  //  if (gp_i_dbnc_rd_en_q)
+ //     device_rdata_o = {{(DataWidth - GpiWidth){1'b0}}, gp_i_dbnc};
+  //  else if (gp_i_rd_en_q)
+  //    device_rdata_o = {{(DataWidth - GpiWidth){1'b0}}, gp_i_q[2]};
+   // else
       device_rdata_o = {{(DataWidth - GpoWidth){1'b0}}, gp_o};
   end
 

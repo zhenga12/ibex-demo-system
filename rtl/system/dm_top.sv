@@ -43,13 +43,7 @@ module dm_top #(
   output logic [BusWidth/8-1:0] host_be_o,
   input  logic                  host_gnt_i,
   input  logic                  host_r_valid_i,
-  input  logic [BusWidth-1:0]   host_r_rdata_i,
-
-  input  logic        tck_i,    // JTAG test clock pad
-  input  logic        tms_i,    // JTAG test mode select pad
-  input  logic        trst_ni,  // JTAG test reset pad
-  input  logic        td_i,     // JTAG test data input pad
-  output logic        td_o      // JTAG test data output pad
+  input  logic [BusWidth-1:0]   host_r_rdata_i
 );
 
   `ASSERT_INIT(paramCheckNrHarts, NrHarts > 0)
@@ -177,8 +171,6 @@ module dm_top #(
     .master_be_o             ( host_be_o             ),
     .master_gnt_i            ( host_gnt_i            ),
     .master_r_valid_i        ( host_r_valid_i        ),
-    .master_r_err_i          ( 1'b0                  ),
-    .master_r_other_err_i    ( 1'b0                  ),
     .master_r_rdata_i        ( host_r_rdata_i        ),
     .dmactive_i              ( dmactive_o            ),
     .sbaddress_i             ( sbaddress_csrs_sba    ),
@@ -236,6 +228,8 @@ module dm_top #(
     .rdata_o                 ( device_rdata_o        )
   );
 
+  // Bound-in DPI module replaces the TAP
+`ifndef DMIDirectTAP
   // JTAG TAP
   dmi_jtag #(
     .IdcodeValue ( IdcodeValue )
@@ -243,7 +237,6 @@ module dm_top #(
     .clk_i            (clk_i        ),
     .rst_ni           (rst_ni       ),
     .testmode_i       (testmode_i   ),
-    .test_rst_ni      (1'b1         ),
 
     .dmi_rst_no       (dmi_rst_n    ),
     .dmi_req_o        (dmi_req      ),
@@ -255,12 +248,13 @@ module dm_top #(
     .dmi_resp_valid_i (dmi_rsp_valid),
 
     //JTAG
-    .tck_i,
-    .tms_i,
-    .trst_ni,
-    .td_i,
-    .td_o,
-    .tdo_oe_o ()
+    .tck_i            (1'b0),
+    .tms_i            (1'b0),
+    .trst_ni          (1'b0),
+    .td_i             (1'b0),
+    .td_o             (),
+    .tdo_oe_o         ()
   );
+`endif
 
 endmodule

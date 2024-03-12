@@ -20,6 +20,8 @@ filesets:
       - rtl/system/uart.sv
       - rtl/system/spi_host.sv
       - rtl/system/spi_top.sv
+      - rtl/system/vga_sync_demo.sv
+      - rtl/system/frame_counter.sv
     file_type: systemVerilogSource
 
 targets:
