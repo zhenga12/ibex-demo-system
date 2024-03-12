@@ -10,7 +10,7 @@
 #include "timer.h"
 
 #define USE_GPIO_SHIFT_REG 0
-
+#define TEST_GPIO 1
 void test_uart_irq_handler(void) __attribute__((interrupt));
 
 void test_uart_irq_handler(void) {
@@ -24,6 +24,16 @@ void test_uart_irq_handler(void) {
 }
 
 int main(void) {
+
+#if TEST_GPIO
+  set_outputs(GPIO_OUT, 0xFFFC);//try to enable RGB, HSYC, VSYNC
+  uint32_t current_val = read_gpio(GPIO_OUT);
+  puts("Current GPIO val:\n");
+  puthex(current_val);
+  puts("\n");
+  return 0;
+#else //if TEST_GPIO
+
   install_exception_handler(UART_IRQ_NUM, &test_uart_irq_handler);
   uart_enable_rx_int();
 
@@ -103,4 +113,5 @@ int main(void) {
 
     asm volatile("wfi");
   }
+#endif //!TEST_GPIO
 }
