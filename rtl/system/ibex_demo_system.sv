@@ -64,6 +64,10 @@ module ibex_demo_system #(
   parameter logic [31:0] SPI_START      = 32'h80004000;
   parameter logic [31:0] SPI_MASK       = ~(SPI_SIZE-1);
 
+  localparam logic [31:0] VGA_SIZE     =  4 * 1024; //  4 KiB
+  localparam logic [31:0] VGA_START    = 32'h80060000;
+  localparam logic [31:0] VGA_MASK     = ~(VGA_SIZE-1);
+
   parameter logic [31:0] SIM_CTRL_SIZE  =  1 * 1024; //  1 KiB
   parameter logic [31:0] SIM_CTRL_START = 32'h20000;
   parameter logic [31:0] SIM_CTRL_MASK  = ~(SIM_CTRL_SIZE-1);
@@ -79,17 +83,18 @@ module ibex_demo_system #(
   } bus_host_e;
 
   typedef enum int {
-    Ram,
+    Ram, //0
     Gpio,
     Pwm,
     Uart,
     Timer,
     Spi,
     SimCtrl,
+    Vga,
     DbgDev
   } bus_device_e;
 
-  localparam int NrDevices = DBG ? 8 : 7;
+  localparam int NrDevices = DBG ? 9 : 8;
   localparam int NrHosts   = DBG ? 2 : 1;
 
   // Interrupts.
@@ -151,6 +156,8 @@ module ibex_demo_system #(
   assign cfg_device_addr_mask[Ram]     = MEM_MASK;
   assign cfg_device_addr_base[Gpio]    = GPIO_START;
   assign cfg_device_addr_mask[Gpio]    = GPIO_MASK;
+  assign cfg_device_addr_base[Vga]     = VGA_START;
+  assign cfg_device_addr_mask[Vga]     = VGA_MASK;
   assign cfg_device_addr_base[Pwm]     = PWM_START;
   assign cfg_device_addr_mask[Pwm]     = PWM_MASK;
   assign cfg_device_addr_base[Uart]    = UART_START;
@@ -171,6 +178,7 @@ module ibex_demo_system #(
   // Tie-off unused error signals.
   assign device_err[Ram]     = 1'b0;
   assign device_err[Gpio]    = 1'b0;
+  assign device_err[Vga]     = 1'b0;
   assign device_err[Pwm]     = 1'b0;
   assign device_err[Uart]    = 1'b0;
   assign device_err[Spi]     = 1'b0;
@@ -316,7 +324,7 @@ module ibex_demo_system #(
     .b_rvalid_o(),
     .b_rdata_o (mem_instr_rdata)
   );
-
+/*
   gpio #(
     .GpiWidth ( GpiWidth ),
     .GpoWidth ( GpoWidth )
@@ -335,20 +343,22 @@ module ibex_demo_system #(
     .gp_i,
     .gp_o
   );
-
+*/
 
 /* verilator lint_off UNUSED */
-  //logic [31:0] hc, vc;
+  logic [31:0] hc, vc;
   //logic [31:0] gpio_reg_copy ;
 /* verilator lint_on UNUSED */
-/*
-  always_ff @(posedge clk_sys_i) begin
-    gpio_reg_copy <= device_rdata[Gpio];
-  end
+
+  //always_ff @(posedge clk_sys_i) begin
+  //  gpio_reg_copy <= device_rdata[Gpio];
+  //end
 
   vga_sync_demo  vga_controller (
     .clk (clk_sys_i),
     .reset (rst_sys_ni),
+
+    /*
     .vga_si_rgb   (device_wdata[Gpio][11:0]),
 
     .rgb (gpio_reg_copy[11:0]),
@@ -356,13 +366,23 @@ module ibex_demo_system #(
     .vsync (gpio_reg_copy[13]),
  
     .hc (hc),
-    .vc (vc)
+    .vc (vc),
+*/
+    .device_req_i   (device_req[Vga]),
+    .device_addr_i  (device_addr[Vga]),
+    .device_we_i    (device_we[Vga]),
+    .device_be_i    (device_be[Vga]),
+    .device_wdata_i (device_wdata[Vga]), //all vga data should be encoded in here
+    .device_rvalid_o(device_rvalid[Vga]),
+    .device_rdata_o (device_rdata[Vga]),
+    .gp_i,
+    .gp_o
   );
   
-  always_ff @(posedge clk_sys_i) begin
-    device_rdata[Gpio] <= gpio_reg_copy;
-  end
-*/
+  //always_ff @(posedge clk_sys_i) begin
+  //  device_rdata[Gpio] <= gpio_reg_copy;
+  //end
+
   pwm_wrapper #(
     .PwmWidth     ( PwmWidth   ),
     .PwmCtrSize   ( PwmCtrSize ),

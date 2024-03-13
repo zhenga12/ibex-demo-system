@@ -44,6 +44,28 @@ module gpio #(
 /* verilator lint_on UNUSED */
 
 
+/* verilator lint_off UNUSED */
+  logic [31:0] hc, vc;
+  logic [11:0] rgb_data;
+  logic h_sync_out;
+  logic v_sync_out;
+
+/* verilator lint_on UNUSED */
+/*
+  vga_sync_demo  vga_controller (
+    .clk (clk_i),
+    .reset (rst_ni),
+    .vga_si_rgb   (device_wdata_i[11:0]),
+
+    .rgb (rgb_data),
+    .hsync (h_sync_out),
+    .vsync (v_sync_out),
+ 
+    .hc (hc),
+    .vc (vc)
+  );
+    logic [GpoWidth-1:0] gpio_vga_data = {{(GpoWidth-14){1'b0}},!v_sync_out, !h_sync_out, rgb_data};
+    */
   // Instantiate debouncers for all GP inputs.
 //  for (genvar i = 0; i < GpiWidth; i++) begin : gen_debounce
 //    debounce #(
@@ -94,22 +116,6 @@ module gpio #(
   assign gp_o_wr_en        = device_req_i &  device_we_i & (reg_addr == GPIO_OUT_REG[RegAddr-1:0]);
   assign gp_i_rd_en_d      = device_req_i & ~device_we_i & (reg_addr == GPIO_IN_REG[RegAddr-1:0]);
   assign gp_i_dbnc_rd_en_d = device_req_i & ~device_we_i & (reg_addr == GPIO_IN_DBNC_REG[RegAddr-1:0]);
-
-/* verilator lint_off UNUSED */
-  logic [31:0] hc, vc;
-/* verilator lint_on UNUSED */
-  vga_sync_demo  vga_controller (
-    .clk (clk_i),
-    .reset (rst_ni),
-    .vga_si_rgb   (device_wdata_i[11:0]),
-
-    .rgb (device_rdata_o[11:0]),
-    .hsync (device_rdata_o[12]),
-    .vsync (device_rdata_o[13]),
- 
-    .hc (hc),
-    .vc (vc)
-  );
 
   // Assign device_rdata_o according to request type.
   always_comb begin

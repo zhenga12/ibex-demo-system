@@ -28,7 +28,7 @@ module top_artya7 #(
 
   // Instantiating the Ibex Demo System.
   ibex_demo_system #(
-    .GpiWidth     ( 12            ),
+    .GpiWidth     ( 16            ),
     .GpoWidth     ( 24            ),
     .PwmWidth     ( 12           ),
     .SRAMInitFile ( SRAMInitFile )
@@ -40,7 +40,7 @@ module top_artya7 #(
     .uart_rx_i (UART_RX),
 
     //output
-    .gp_o     ({rgb, hsync, vsync, LED, DISP_CTRL}),
+    .gp_o     ({vsync, hsync, rgb}),
     .pwm_o    (RGB_LED),
     .uart_tx_o(UART_TX),
 
