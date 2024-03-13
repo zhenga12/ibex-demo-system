@@ -64,10 +64,17 @@ module ibex_decoder #(
   output logic                 rf_ren_b_o,          // Instruction reads from RF addr B
 
   // vector register file
-  output logic                 vrf_we_o,          // write enable for vector regfile
-  output logic                 vrf_ren_a_o,          // Instruction reads from RF addr A
-  output logic                 vrf_ren_b_o,          // Instruction reads from RF addr B
+  // TODO:
+//  output logic                 vrf_we_o,          // write enable for vector regfile
+//  output logic                 vrf_ren_a_o,          // Instruction reads from RF addr A
+//  output logic                 vrf_ren_b_o,          // Instruction reads from RF addr B
+  
+  // VEC
+  output ibex_pkg::vec_op_e    vec_operator_o,
+  output ibex_pkg::op_a_sel_e  vec_op_a_mux_sel_o,    // operand a selection: reg value
+  output ibex_pkg::op_b_sel_e  vec_op_b_mux_sel_o,    // operand b selection: reg value
 
+ 
   // ALU
   output ibex_pkg::alu_op_e    alu_operator_o,        // ALU operation selection
   output ibex_pkg::op_a_sel_e  alu_op_a_mux_sel_o,    // operand a selection: reg value, PC,
@@ -125,6 +132,7 @@ module ibex_decoder #(
 
   opcode_e     opcode;
   opcode_e     opcode_alu;
+  opcode_e     opcode_vec; 
 
   // To help timing the flops containing the current instruction are replicated to reduce fan-out.
   // instr_alu is used to determine the ALU control logic and associated operand/imm select signals
@@ -241,25 +249,28 @@ module ibex_decoder #(
 
     unique case (opcode)
 
+      /////////////
+      // Vectors //
+      /////////////
+
       OPCODE_VEC0: begin // VEC0
         unique case (instr[14:12])
           3'b000, // vsetvli
-          3'b001, // vadd
-          3'b100, // vmul
-          3'b101, 
-          3'b110, 
-          3'b111:  illegal_insn = 1'b0;
+          3'b001, // vdotvv
+          3'b010, // vaddvv
+          3'b011  // vmultvv
+          :        illegal_insn = 1'b0;
           default: illegal_insn = 1'b1;
         endcase
-        //rf_ren_a_o = 1'b1;
-        //rf_ren_b_o = 1'b1;
-        //rf_we      = 1'b1;
-        vrf_ren_a_o = 1'b1;
-        vrf_ren_b_o = 1'b1;
-        vrf_ren_c_o = 1'b1;
-        vrf_we      = 1'b1;
+        rf_ren_a_o = 1'b1;
+        rf_ren_b_o = 1'b1;
+        rf_we      = 1'b1;
+        // TODO: maybe need maybe dont need
+        //vrf_ren_a_o = 1'b1;
+        //vrf_ren_b_o = 1'b1;
+        //vrf_ren_c_o = 1'b1;
+        //vrf_we      = 1'b1;
       end
-
 
       ///////////
       // Jumps //
@@ -694,6 +705,8 @@ module ibex_decoder #(
   /////////////////////////////
 
   always_comb begin
+    //vec_operator_o     = ; // TODO: need to do?
+
     alu_operator_o     = ALU_SLTU;
     alu_op_a_mux_sel_o = OP_A_IMM;
     alu_op_b_mux_sel_o = OP_B_IMM;
@@ -704,28 +717,48 @@ module ibex_decoder #(
     bt_a_mux_sel_o     = OP_A_CURRPC;
     bt_b_mux_sel_o     = IMM_B_I;
 
-
     opcode_alu         = opcode_e'(instr_alu[6:0]);
+    opcode_vec         = opcode_e'(instr_alu[6:0]);
 
     use_rs3_d          = 1'b0;
     alu_multicycle_o   = 1'b0;
     mult_sel_o         = 1'b0;
     div_sel_o          = 1'b0;
 
+// OPCODE VEC
+
+    unique case (opcode_vec)
+      ////////////
+      // Vector //
+      ////////////
+     OPCODE_VEC0: begin
+     vec_op_a_mux_sel_o  = OP_A_REG_A;
+     vec_op_b_mux_sel_o  = OP_B_REG_B;
+     unique case (instr_alu[14:12])
+        3'b000 : vec_operator_o = VSETVLI;  // this can stay here
+        default: ;
+     endcase
+    end
+    default: ;
+    endcase
+
+// OPCODE ALU
     unique case (opcode_alu)
 
       ////////////
       // Vector //
       ////////////
+
      OPCODE_VEC0: begin
-     alu_op_a_mux_sel_o
-     alu_op_b_mux_sel_o
+     alu_op_a_mux_sel_o  = OP_A_REG_A;
+     alu_op_b_mux_sel_o  = OP_B_REG_B;
      unique case (instr_alu[14:12])
-        3'b000 : alu_operator = VSETVLI;
-        3'b001 : alu_operator = VADD;
-        3'b010 : alu_operator = VMUL;
+        3'b001 : alu_operator_o = VDOTVV;
+        3'b010 : alu_operator_o = VADDVV;
+        3'b011:  alu_operator_o = VMULVV;
         default: ;
-     end
+     endcase
+    end
 
       ///////////
       // Jumps //
@@ -1217,7 +1250,6 @@ module ibex_decoder #(
             alu_op_a_mux_sel_o = OP_A_REG_A;
           end
         end
-
       end
       default: ;
     endcase

@@ -1,9 +1,11 @@
-/* RISC-V Vector register file
+/* ------------------------------- 
+ * RISC-V Vector register file
  * ----------------------------------------------------------------------
- * Register file with 32, 32 bit wide registers. Register 0 is fixed to 0 for masking.
- *
- * 
- *
+ * Register file with 32 by 32 bit wide registers. Register 0 is fixed to 0 for masking.
+ * Supporting VSEW: 8b, 16b, 32b
+ * Supporting VLMUL: 1, 2, 4
+ * Input: 128b
+ * Ouptut: 3 x 128b
  */
 
 module ibex_register_file_vector (
@@ -19,7 +21,7 @@ module ibex_register_file_vector (
     input  logic          [128-1:0]         v_wdata_i,
     input  logic          [5-1:0]           v_waddr_i,
     input  logic                            v_we_i,
-    input  logic          [4-1:0]           v_wnum, // one-hot encoding for number of elements to write
+    input  logic          [4-1:0]           v_wnum_i, // one-hot encoding for number of elements to write
     input  logic                            v_load_en_i, // load enable
 
     // Read port A
@@ -43,7 +45,7 @@ module ibex_register_file_vector (
     localparam VLMIN  = 8;
 
     // Vector Registers: v0 ... v31
-    logic [VLEN-1:0] vregs [LEN-1:0];
+    logic [VLEN-1:0] vector_r [LEN-1:0];
 
     // Write Registers from Input Write Data 
     logic [VLEN-1:0] v_wdata_0;
@@ -91,32 +93,32 @@ module ibex_register_file_vector (
 // Logic to Populate Register File
     always_ff @(posedge clk_i, rstn_i) begin
         if(~rstn_i) begin
-            vregs <= '{VLEN{'0}};
+            vector_r <= '{VLEN{'0}};
         end else begin
             if (v_we_i & (v_waddr_i != '0)) begin
                 // 128b input write data --> 4 groups of 32 bits
                 // 4 groups of 8 bits SEW = 32b VLEN
 
                 // group 0
-                if (v_we_0[0]) vregs[v_waddr_0][VLMIN*1 - 1 -: VLMIN] <= v_wdata_0[VLMIN*1 - 1 -: VLMIN];
-                if (v_we_0[1]) vregs[v_waddr_0][VLMIN*2 - 1 -: VLMIN] <= v_wdata_0[VLMIN*2 - 1 -: VLMIN];
-                if (v_we_0[2]) vregs[v_waddr_0][VLMIN*3 - 1 -: VLMIN] <= v_wdata_0[VLMIN*3 - 1 -: VLMIN];
-                if (v_we_0[3]) vregs[v_waddr_0][VLMIN*4 - 1 -: VLMIN] <= v_wdata_0[VLMIN*4 - 1 -: VLMIN];
+                if (v_we_0[0]) vector_r[v_waddr_0][VLMIN*1 - 1 -: VLMIN] <= v_wdata_0[VLMIN*1 - 1 -: VLMIN];
+                if (v_we_0[1]) vector_r[v_waddr_0][VLMIN*2 - 1 -: VLMIN] <= v_wdata_0[VLMIN*2 - 1 -: VLMIN];
+                if (v_we_0[2]) vector_r[v_waddr_0][VLMIN*3 - 1 -: VLMIN] <= v_wdata_0[VLMIN*3 - 1 -: VLMIN];
+                if (v_we_0[3]) vector_r[v_waddr_0][VLMIN*4 - 1 -: VLMIN] <= v_wdata_0[VLMIN*4 - 1 -: VLMIN];
                 // group 1
-                if (v_we_1[0]) vregs[v_waddr_1][VLMIN*1 - 1 -: VLMIN] <= v_wdata_1[VLMIN*1 - 1 -: VLMIN];
-                if (v_we_1[1]) vregs[v_waddr_1][VLMIN*2 - 1 -: VLMIN] <= v_wdata_1[VLMIN*2 - 1 -: VLMIN];
-                if (v_we_1[2]) vregs[v_waddr_1][VLMIN*3 - 1 -: VLMIN] <= v_wdata_1[VLMIN*3 - 1 -: VLMIN];
-                if (v_we_1[3]) vregs[v_waddr_1][VLMIN*4 - 1 -: VLMIN] <= v_wdata_1[VLMIN*4 - 1 -: VLMIN];   
+                if (v_we_1[0]) vector_r[v_waddr_1][VLMIN*1 - 1 -: VLMIN] <= v_wdata_1[VLMIN*1 - 1 -: VLMIN];
+                if (v_we_1[1]) vector_r[v_waddr_1][VLMIN*2 - 1 -: VLMIN] <= v_wdata_1[VLMIN*2 - 1 -: VLMIN];
+                if (v_we_1[2]) vector_r[v_waddr_1][VLMIN*3 - 1 -: VLMIN] <= v_wdata_1[VLMIN*3 - 1 -: VLMIN];
+                if (v_we_1[3]) vector_r[v_waddr_1][VLMIN*4 - 1 -: VLMIN] <= v_wdata_1[VLMIN*4 - 1 -: VLMIN];   
                 // group 2
-                if (v_we_2[0]) vregs[v_waddr_2][VLMIN*1 - 1 -: VLMIN] <= v_wdata_2[VLMIN*1 - 1 -: VLMIN];
-                if (v_we_2[1]) vregs[v_waddr_2][VLMIN*2 - 1 -: VLMIN] <= v_wdata_2[VLMIN*2 - 1 -: VLMIN];
-                if (v_we_2[2]) vregs[v_waddr_2][VLMIN*3 - 1 -: VLMIN] <= v_wdata_2[VLMIN*3 - 1 -: VLMIN];
-                if (v_we_2[3]) vregs[v_waddr_2][VLMIN*4 - 1 -: VLMIN] <= v_wdata_2[VLMIN*4 - 1 -: VLMIN];
+                if (v_we_2[0]) vector_r[v_waddr_2][VLMIN*1 - 1 -: VLMIN] <= v_wdata_2[VLMIN*1 - 1 -: VLMIN];
+                if (v_we_2[1]) vector_r[v_waddr_2][VLMIN*2 - 1 -: VLMIN] <= v_wdata_2[VLMIN*2 - 1 -: VLMIN];
+                if (v_we_2[2]) vector_r[v_waddr_2][VLMIN*3 - 1 -: VLMIN] <= v_wdata_2[VLMIN*3 - 1 -: VLMIN];
+                if (v_we_2[3]) vector_r[v_waddr_2][VLMIN*4 - 1 -: VLMIN] <= v_wdata_2[VLMIN*4 - 1 -: VLMIN];
                 // group 3
-                if (v_we_3[0]) vregs[v_waddr_3][VLMIN*1 - 1 -: VLMIN] <= v_wdata_3[VLMIN*1 - 1 -: VLMIN];
-                if (v_we_3[1]) vregs[v_waddr_3][VLMIN*2 - 1 -: VLMIN] <= v_wdata_3[VLMIN*2 - 1 -: VLMIN];
-                if (v_we_3[2]) vregs[v_waddr_3][VLMIN*3 - 1 -: VLMIN] <= v_wdata_3[VLMIN*3 - 1 -: VLMIN];
-                if (v_we_3[3]) vregs[v_waddr_3][VLMIN*4 - 1 -: VLMIN] <= v_wdata_3[VLMIN*4 - 1 -: VLMIN];
+                if (v_we_3[0]) vector_r[v_waddr_3][VLMIN*1 - 1 -: VLMIN] <= v_wdata_3[VLMIN*1 - 1 -: VLMIN];
+                if (v_we_3[1]) vector_r[v_waddr_3][VLMIN*2 - 1 -: VLMIN] <= v_wdata_3[VLMIN*2 - 1 -: VLMIN];
+                if (v_we_3[2]) vector_r[v_waddr_3][VLMIN*3 - 1 -: VLMIN] <= v_wdata_3[VLMIN*3 - 1 -: VLMIN];
+                if (v_we_3[3]) vector_r[v_waddr_3][VLMIN*4 - 1 -: VLMIN] <= v_wdata_3[VLMIN*4 - 1 -: VLMIN];
             end 
         end
     end
@@ -159,10 +161,10 @@ module ibex_register_file_vector (
         end else begin
             case(vsew_i)
                 // 8b select element width
-                3'b000: v_we_0 = v_wnum;
+                3'b000: v_we_0 = v_wnum_i;
                 // 16b select element width
                 3'b001: begin // 16b
-                    case (v_wnum)
+                    case (v_wnum_i)
                         4'b0001: begin // 1 elements of 16b
                             v_we_0 = 4'b0011;
                         end
@@ -183,7 +185,7 @@ module ibex_register_file_vector (
 
                 // 32b select element width
                 3'b010: begin
-                    case(v_wnum)
+                    case(v_wnum_i)
                         4'b0001: begin
                             v_we_0 = 4'b1111;
                         end
@@ -387,24 +389,22 @@ module ibex_register_file_vector (
         v_waddr_1 = {v_waddr_i[4:1], 1'b1};
         v_waddr_2 = {v_waddr_i[4:2], 1'b1, v_waddr_i[0]};
         v_waddr_3 = {v_waddr_i[4:2], 2'b11};
-    
-    
     end
 
     // REGISTER READ
-    assign v_rdata_a_0 = vregs[v_raddr_a_0];
-    assign v_rdata_a_1 = vregs[v_raddr_a_1];
-    assign v_rdata_a_2 = vregs[v_raddr_a_2];
-    assign v_rdata_a_3 = vregs[v_raddr_a_3];
+    assign v_rdata_a_0 = vector_r[v_raddr_a_0];
+    assign v_rdata_a_1 = vector_r[v_raddr_a_1];
+    assign v_rdata_a_2 = vector_r[v_raddr_a_2];
+    assign v_rdata_a_3 = vector_r[v_raddr_a_3];
 
-    assign v_rdata_b_0 = vregs[v_raddr_b_0];
-    assign v_rdata_b_1 = vregs[v_raddr_b_1];
-    assign v_rdata_b_2 = vregs[v_raddr_b_2];
-    assign v_rdata_b_3 = vregs[v_raddr_b_3];
+    assign v_rdata_b_0 = vector_r[v_raddr_b_0];
+    assign v_rdata_b_1 = vector_r[v_raddr_b_1];
+    assign v_rdata_b_2 = vector_r[v_raddr_b_2];
+    assign v_rdata_b_3 = vector_r[v_raddr_b_3];
 
-    assign v_rdata_c_0 = vregs[v_waddr_0];
-    assign v_rdata_c_1 = vregs[v_waddr_1];
-    assign v_rdata_c_2 = vregs[v_waddr_2];
-    assign v_rdata_c_3 = vregs[v_waddr_3];
+    assign v_rdata_c_0 = vector_r[v_waddr_0];
+    assign v_rdata_c_1 = vector_r[v_waddr_1];
+    assign v_rdata_c_2 = vector_r[v_waddr_2];
+    assign v_rdata_c_3 = vector_r[v_waddr_3];
 
 endmodule // vector_register_file

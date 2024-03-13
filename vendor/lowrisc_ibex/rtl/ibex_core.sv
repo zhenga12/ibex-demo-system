@@ -248,6 +248,10 @@ module ibex_core import ibex_pkg::*; #(
   logic        rf_rd_a_wb_match;
   logic        rf_rd_b_wb_match;
 
+  // VEC Control
+  vec_op_e     vec_operator_ex;
+  logic [31:0] vec_operand_a_ex;
+  logic [31:0] vec_operand_b_ex;
   // ALU Control
   alu_op_e     alu_operator_ex;
   logic [31:0] alu_operand_a_ex;
@@ -579,7 +583,13 @@ module ibex_core import ibex_pkg::*; #(
     // Stalls
     .ex_valid_i      (ex_valid),
     .lsu_resp_valid_i(lsu_resp_valid),
+    
+    // VEC
+    .vec_operator_ex_o (vec_operator_ex),
+    .vec_operand_a_ex_o(vec_operand_a_ex),
+    .vec_operand_b_ex_o(vec_operand_b_ex),
 
+    // ALU
     .alu_operator_ex_o (alu_operator_ex),
     .alu_operand_a_ex_o(alu_operand_a_ex),
     .alu_operand_b_ex_o(alu_operand_b_ex),
@@ -698,6 +708,11 @@ module ibex_core import ibex_pkg::*; #(
   ) ex_block_i (
     .clk_i (clk_i),
     .rst_ni(rst_ni),
+
+    // VEC signal from ID stage 
+    .vec_operator_i         (vec_operator_ex),
+    .vec_operand_a_i        (vec_operand_a_ex),
+    .vec_operand_b_i        (vec_operand_b_ex),
 
     // ALU signal from ID stage
     .alu_operator_i         (alu_operator_ex),

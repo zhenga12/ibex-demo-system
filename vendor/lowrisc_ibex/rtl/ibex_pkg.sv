@@ -72,16 +72,25 @@ package ibex_pkg;
     OPCODE_SYSTEM   = 7'h73
   } opcode_e;
 
+  ///////////////////////
+  // Vector Operations //
+  ///////////////////////
+
+  typedef enum logic [6:0]{
+    VSETVLI,
+    VLE8,
+    VLE16,
+    VLE32
+  } vec_op_e;
 
   ////////////////////
   // ALU operations //
   ////////////////////
 
   typedef enum logic [6:0] {
-    // Vectors
-    VSETVLI,
-    VADD,
-    VMUL,
+    VDOTVV,
+    VADDVV,
+    VMULVV,
     // Arithmetics
     ALU_ADD,
     ALU_SUB,
@@ -593,15 +602,7 @@ package ibex_pkg;
     CSR_MHPMCOUNTER30H = 12'hB9E,
     CSR_MHPMCOUNTER31H = 12'hB9F,
     CSR_CPUCTRLSTS     = 12'h7C0,
-    CSR_SECURESEED     = 12'h7C1,
-
-    // Vector CSR
-    CSR_VSTART         = 12'h008,
-    CSR_VL             = 12'hC20,
-    CSR_VTYPE          = 12'hC21,
-    CSR_VLENB          = 12'hC22
-        
-    
+    CSR_SECURESEED     = 12'h7C1
   } csr_num_e;
 
   // CSR pmp-related offsets

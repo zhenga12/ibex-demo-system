@@ -9,6 +9,11 @@
 module ibex_alu #(
   parameter ibex_pkg::rv32b_e RV32B = ibex_pkg::RV32BNone
 ) (
+  input logic [4:0]         vl_i,
+  input logic [2:0]         vsew_i,
+  input logic [2:0]         vlmul_i,
+  input logic [4:0]         vl_next_i,
+
   input  ibex_pkg::alu_op_e operator_i,
   input  logic [31:0]       operand_a_i,
   input  logic [31:0]       operand_b_i,
@@ -40,6 +45,17 @@ module ibex_alu #(
   for (genvar k = 0; k < 32; k++) begin : gen_rev_operand_a
     assign operand_a_rev[k] = operand_a_i[31-k];
   end
+
+  /////////////////
+  // Vector Unit //
+  /////////////////
+  // TODO: Add VPU Arith Unit here
+  logic [31:0] vector_result;
+  
+  always_comb begin
+    vector_result = 32'd1;
+  end
+
 
   ///////////
   // Adder //
@@ -1320,6 +1336,8 @@ module ibex_alu #(
     result_o   = '0;
 
     unique case (operator_i)
+      VDOTVV, VADDVV, VMULVV: result_o = vector_result;
+
       // Bitwise Logic Operations (negate: RV32B)
       ALU_XOR,  ALU_XNOR,
       ALU_OR,   ALU_ORN,

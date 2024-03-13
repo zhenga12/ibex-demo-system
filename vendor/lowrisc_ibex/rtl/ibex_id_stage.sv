@@ -67,6 +67,11 @@ module ibex_id_stage #(
   // Stalls
   input  logic                      ex_valid_i,       // EX stage has valid output
   input  logic                      lsu_resp_valid_i, // LSU has valid output, or is done
+  // VEC
+  output ibex_pkg::vec_op_e         vec_operator_ex_o,
+  output logic [31:0]               vec_operand_a_ex_o,
+  output logic [31:0]               vec_operand_b_ex_o,
+
   // ALU
   output ibex_pkg::alu_op_e         alu_operator_ex_o,
   output logic [31:0]               alu_operand_a_ex_o,
@@ -171,11 +176,10 @@ module ibex_id_stage #(
   input  logic                      rf_write_wb_i,
 
   // Vector register file read
-  output logic                      vrf_ren_a_o,
-  output logic                      vrf_ren_b_o,
+  // TODO: need to interface with register file.
+  //output logic                      vrf_ren_a_o,
+  //output logic                      vrf_ren_b_o,
 
-
-  // TODO: Probably need to add more signals for vregfile interfacing...
 
   output  logic                     en_wb_o,
   output  ibex_pkg::wb_instr_type_e instr_type_wb_o,
@@ -265,7 +269,8 @@ module ibex_id_stage #(
   logic [31:0] rf_rdata_b_fwd;
 
   // Vector register file interface
-  logic        vrf_we_dec, vrf_we_raw;
+  // TODO: Need to connection and finish...
+  /*logic        vrf_we_dec, vrf_we_raw;
   logic        vrf_ren_a, vrf_ren_b;
   logic        vrf_ren_a_dec, vrf_ren_b_dec;
   // Read enables should only be asserted for valid and legal instructions
@@ -274,6 +279,12 @@ module ibex_id_stage #(
 
   assign vrf_ren_a_o = vrf_ren_a;
   assign vrf_ren_b_o = vrf_ren_b;
+*/
+  //VEC Control
+  vec_op_e     vec_operator;
+  op_a_sel_e   vec_op_a_mux_sel, vec_op_a_mux_sel_dec;
+  op_b_sel_e   vec_op_b_mux_sel, vec_op_b_mux_sel_dec;
+
   // ALU Control
   alu_op_e     alu_operator;
   op_a_sel_e   alu_op_a_mux_sel, alu_op_a_mux_sel_dec;
@@ -308,6 +319,19 @@ module ibex_id_stage #(
 
   logic [31:0] alu_operand_a;
   logic [31:0] alu_operand_b;
+  logic [31:0] vec_operand_a;
+  logic [31:0] vec_operand_b;
+
+  // TODO: how does load and store work and what are these OP_A_FWD OP_B_IMM ????
+  // TODO: Connect muxing logic from LSU
+
+  ////////////////////
+  // VECTOR LSU Mux //
+  ////////////////////
+
+  // Misaligned loads/stores result in two aligned loads/stores, compute second address
+  assign vec_op_a_mux_sel = vec_op_a_mux_sel_dec; 
+  assign vec_op_b_mux_sel = vec_op_b_mux_sel_dec; 
 
   /////////////
   // LSU Mux //
@@ -494,11 +518,15 @@ module ibex_id_stage #(
     .rf_ren_a_o  (rf_ren_a_dec),
     .rf_ren_b_o  (rf_ren_b_dec),
 
-    // vector register file
-    .vrf_we_o       (vrf_we_dec),   
-    .vrf_ren_a_o    (vrf_ren_a_dec),
-    .vrf_ren_b_o    (vrf_ren_b_dec),
-
+    // vector register file TODO
+    //.vrf_we_o       (vrf_we_dec),   
+    //.vrf_ren_a_o    (vrf_ren_a_dec),
+    //.vrf_ren_b_o    (vrf_ren_b_dec),
+    
+    // VEC
+    .vec_operator_o    (vec_operator),    
+    .vec_op_a_mux_sel_o(vec_op_a_mux_sel_dec),
+    .vec_op_b_mux_sel_o(vec_op_b_mux_sel_dec),
     // ALU
     .alu_operator_o    (alu_operator),
     .alu_op_a_mux_sel_o(alu_op_a_mux_sel_dec),

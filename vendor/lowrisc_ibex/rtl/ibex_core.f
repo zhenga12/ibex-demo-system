@@ -16,3 +16,5 @@ ibex_fetch_fifo.sv
 ibex_register_file_ff.sv
 ibex_core.sv
 ibex_register_file_vector.sv
+ibex_vector_csr.sv
+ibex_vector_lsu.sv

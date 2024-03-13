@@ -16,6 +16,11 @@ module ibex_ex_block #(
   input  logic                  clk_i,
   input  logic                  rst_ni,
 
+  // VEC
+  input ibex_pkg::vec_op_e      vec_operator_i,
+  input  logic [31:0]           vec_operand_a_i,
+  input  logic [31:0]           vec_operand_b_i,
+
   // ALU
   input  ibex_pkg::alu_op_e     alu_operator_i,
   input  logic [31:0]           alu_operand_a_i,
@@ -108,6 +113,38 @@ module ibex_ex_block #(
 
     assign branch_target_o = alu_adder_result_ex_o;
   end
+   
+  ////////////////
+  // VECTOR CSR //
+  ////////////////
+// Vector CSR Signals
+  logic [4:0] vl_vec_csr;
+  logic [2:0] vsew_vec_csr;
+  logic [2:0] vlmul_vec_csr;
+  logic [4:0] vl_next_vec_csr;
+
+  logic vcsr_w_en; // probably fed from lsu?
+  logic vl_max; // probably from lsu?
+  logic vl_w_en; // probably form lsu?
+
+  ibex_vector_csr vector_csr (
+    .clk_i(clk_i),
+    .rstn_i(rst_ni),
+    // Func7, RS1, RS2
+    .vec_operator_i(vec_operator_i),
+    .avl_i(vec_operand_a_i),
+    .vtype_i(vec_operand_b_i),
+    // CSR Write Enable 
+    .vcsr_w_en_i(vcsr_w_en),
+    // VL
+    .vl_max_i(vl_max),
+    .vl_w_en_i(vl_w_en),
+    // Output
+    .vl_o(vl_vec_csr),
+    .vsew_o(vsew_vec_csr),
+    .vlmul_o(vlmul_vec_csr),
+    .vl_next_o(vl_next_vec_csr)
+  );
 
   /////////
   // ALU //
@@ -116,6 +153,10 @@ module ibex_ex_block #(
   ibex_alu #(
     .RV32B(RV32B)
   ) alu_i (
+    .vl_i               (vl_vec_csr),
+    .vsew_i             (vsew_vec_csr),
+    .vlmul_i            (vlmul_vec_csr),
+    .vl_next_i          (vl_next_vec_csr),
     .operator_i         (alu_operator_i),
     .operand_a_i        (alu_operand_a_i),
     .operand_b_i        (alu_operand_b_i),
