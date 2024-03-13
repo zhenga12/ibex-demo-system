@@ -11,7 +11,7 @@ module vga_demo
    // logic [CD-1:0] declaration
    logic [10:0] hc, vc;
    logic [CD-1:0] bar_rgb, back_rgb, gray_rgb, color_rgb, vga_rgb;
-   logic [CD-1:0] bypass_bar, bypass_gra;
+   logic [CD-1:0] bypass_bar, bypass_gray;
    
    // body
    // use switches to set background color

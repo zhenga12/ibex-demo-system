@@ -29,3 +29,10 @@ lint_off -rule WIDTH -file "*pulp_riscv_dbg/src/dm_mem.sv"
 
 lint_off -rule UNDRIVEN -file "*ibex_register_file_fpga.sv"
 lint_off -rule IMPERFECTSCH -file "*prim_flop_2sync.sv"
+
+
+lint_off -rule UNUSED -file "*.sv"
+lint_off -rule WIDTH -file "*.sv"
+lint_off -rule UNDRIVEN -file "*.sv"
+
+

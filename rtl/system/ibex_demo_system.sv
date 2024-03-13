@@ -354,31 +354,13 @@ module ibex_demo_system #(
   //  gpio_reg_copy <= device_rdata[Gpio];
   //end
 
-  vga_sync_demo  vga_controller (
+  vga_demo vga_check (
     .clk (clk_sys_i),
-    .reset (rst_sys_ni),
-
-    /*
-    .vga_si_rgb   (device_wdata[Gpio][11:0]),
-
-    .rgb (gpio_reg_copy[11:0]),
-    .hsync (gpio_reg_copy[12]),
-    .vsync (gpio_reg_copy[13]),
- 
-    .hc (hc),
-    .vc (vc),
-*/
-    .device_req_i   (device_req[Vga]),
-    .device_addr_i  (device_addr[Vga]),
-    .device_we_i    (device_we[Vga]),
-    .device_be_i    (device_be[Vga]),
-    .device_wdata_i (device_wdata[Vga]), //all vga data should be encoded in here
-    .device_rvalid_o(device_rvalid[Vga]),
-    .device_rdata_o (device_rdata[Vga]),
-    .gp_i,
-    .gp_o
+    .sw (gp_i[3:0]),
+    .hsync (gp_o[12]),
+    .vsync (gp_o[13]),
+    .rgb (gp_o[11:0])
   );
-  
   //always_ff @(posedge clk_sys_i) begin
   //  device_rdata[Gpio] <= gpio_reg_copy;
   //end

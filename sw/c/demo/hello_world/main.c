@@ -26,7 +26,12 @@ void test_uart_irq_handler(void) {
 int main(void) {
 
 #if TEST_GPIO
-  set_outputs(GPIO_OUT, 0xFFFC);//try to enable RGB, HSYC, VSYNC
+  while(1)
+  {
+    int x = 1;
+  }
+  set_outputs(GPIO_OUT, 0xBEEF);//try to enable RGB, HSYC, VSYNC
+  sim_halt();
   uint32_t current_val = read_gpio(GPIO_OUT);
   puts("Current GPIO val:\n");
   puthex(current_val);

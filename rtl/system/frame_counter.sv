@@ -1,7 +1,7 @@
 module frame_counter
    #(parameter HMAX = 640,  // max horizontal count
                VMAX = 480,    // max vertical count
-               COUNTER_BITS = 32
+               COUNTER_BITS = 11
    )       
    (
     input  logic clk,
