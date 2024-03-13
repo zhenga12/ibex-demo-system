@@ -8,41 +8,38 @@
 
 module ibex_register_file_vector (
   // Clock and Reset
-    input  logic                             clk_i,
-    input  logic                             rst_ni,
+    input  logic                            clk_i,
+    input  logic                            rstn_i,
     
     // CSR Settings
-    input  logic          [2:0]              vsew_i, //standard element length
-    input  logic          [2:0]              vlmul_i, // group multiple
+    input  logic          [3-1:0]           vsew_i, //standard element length
+    input  logic          [3-1:0]           vlmul_i, // group multiplier
     
     // Write input data
-    input  logic          [127:0]            v_wdata_i,
-    input  logic          [4:0]              v_waddr_i,
-    input  logic                             v_we_i,
-    input  logic          [3:0]              v_wnum, // one-hot encoding for number of elements to write
-    input  logic                             v_load_en_i, // load enable
+    input  logic          [128-1:0]         v_wdata_i,
+    input  logic          [5-1:0]           v_waddr_i,
+    input  logic                            v_we_i,
+    input  logic          [4-1:0]           v_wnum, // one-hot encoding for number of elements to write
+    input  logic                            v_load_en_i, // load enable
 
     // Read port A
-    input  logic          [4:0]              v_raddr_a_i,
-    output logic          [VLEN-1:0]         v_rdata_a_o,
+    input  logic          [5-1:0]           v_raddr_a_i,
+    output logic          [128-1:0]         v_rdata_a_o,
 
     // Read port B
-    input  logic          [4:0]              v_raddr_b_i,
-    output logic          [VLEN-1:0]         v_rdata_b_o,
+    input  logic          [4:0]             v_raddr_b_i,
+    output logic          [128-1:0]         v_rdata_b_o,
 
     // Read port C
-    input  logic          [4:0]              v_raddr_c_i,
-    output logic          [VLEN-1:0]         v_rdata_c_o,
+    input  logic          [5-1:0]           v_raddr_c_i,
+    output logic          [128-1:0]         v_rdata_c_o
 
-    // output data
-    output logic          [128-1:0]          v_reg_o
 );
   
 
-    localparam VLEN = 32,
-    localparam LEN  = 32
+    localparam VLEN = 32;
+    localparam LEN  = 32;
 
-    localparam VLMAX  = VLEN / vsew_i * vlmul_i; 
     localparam VLMIN  = 8;
 
     // Vector Registers: v0 ... v31
@@ -92,11 +89,11 @@ module ibex_register_file_vector (
     logic [4:0] v_raddr_b_3;
 
 // Logic to Populate Register File
-    always_ff @(posedge clki, rstn_i) begin
+    always_ff @(posedge clk_i, rstn_i) begin
         if(~rstn_i) begin
-            vreg <= '{VLEN{'0}};
+            vregs <= '{VLEN{'0}};
         end else begin
-            if (v_we_i & (v_waddr_i != '0) begin
+            if (v_we_i & (v_waddr_i != '0)) begin
                 // 128b input write data --> 4 groups of 32 bits
                 // 4 groups of 8 bits SEW = 32b VLEN
 
@@ -132,9 +129,9 @@ module ibex_register_file_vector (
         v_we_3 = 'd0;
 
         if (v_load_en_i) begin
-            unique case (vlmul_i)
+            case (vlmul_i)
                 3'b000: begin // 1
-                    case(v_waddr[1:0])
+                    case(v_waddr_i[1:0])
                         2'b00: v_we_0 = 'd1;
                         2'b01: v_we_1 = 'd1;
                         2'b10: v_we_2 = 'd1;
@@ -142,7 +139,7 @@ module ibex_register_file_vector (
                     endcase
                 end
                 3'b001: begin // 2
-                    if(~v_waddr[1]) begin
+                    if(~v_waddr_i[1]) begin
                         v_we_0 = 'd1;
                         v_we_1 = 'd1;    
                     end else begin
@@ -156,9 +153,11 @@ module ibex_register_file_vector (
                     v_we_2 = 'd1; 
                     v_we_3 = 'd1; 
                 end
+                default: begin 
+                end
             endcase         
         end else begin
-            unique case(vsew_i)
+            case(vsew_i)
                 // 8b select element width
                 3'b000: v_we_0 = v_wnum;
                 // 16b select element width
@@ -178,28 +177,35 @@ module ibex_register_file_vector (
                             v_we_0 = 4'b1111;
                             v_we_1 = 4'b1111;
                         end
+                        default: begin end
                     endcase
                 end
 
                 // 32b select element width
                 3'b010: begin
-                    case(v_wnum):
-                        4'b0001:
+                    case(v_wnum)
+                        4'b0001: begin
                             v_we_0 = 4'b1111;
-                        4'b0011:
+                        end
+                        4'b0011: begin
                             v_we_0 = 4'b1111;
                             v_we_1 = 4'b1111;
-                        4'b0111:
+                            end
+                        4'b0111: begin
                             v_we_0 = 4'b1111;
                             v_we_1 = 4'b1111;
                             v_we_2 = 4'b1111;
-                        4'b0111:
+                            end
+                        4'b1111: begin
                             v_we_0 = 4'b1111;
                             v_we_1 = 4'b1111;
                             v_we_2 = 4'b1111;
                             v_we_3 = 4'b1111;
+                            end
+                            default: begin end
                     endcase
                 end
+                default: begin end
             endcase
         end
     end
@@ -213,7 +219,7 @@ module ibex_register_file_vector (
     
         if(v_load_en_i) begin
             case (vlmul_i)
-                2'b00: begin
+                3'b000: begin
                     case(v_waddr_i[1:0])
                        2'b00 : v_wdata_0 = v_wdata_i[VLEN*1-1 -: VLEN]; 
                        2'b01 : v_wdata_1 = v_wdata_i[VLEN*2-1 -: VLEN]; 
@@ -221,7 +227,7 @@ module ibex_register_file_vector (
                        2'b11 : v_wdata_3 = v_wdata_i[VLEN*4-1 -: VLEN]; 
                     endcase
                 end
-                2'b01: begin
+                3'b001: begin
                     if(~v_waddr_i[1]) begin
                         v_wdata_0 = v_wdata_i[VLEN*1-1 -: VLEN];
                         v_wdata_1 = v_wdata_i[VLEN*2-1 -: VLEN];
@@ -230,24 +236,25 @@ module ibex_register_file_vector (
                         v_wdata_3 = v_wdata_i[VLEN*4-1-: VLEN];
                     end
                 end
-                2'b10: begin
+                3'b010: begin
                         v_wdata_0 = v_wdata_i[VLEN*1-1 -: VLEN];
                         v_wdata_1 = v_wdata_i[VLEN*2-1 -: VLEN];
                         v_wdata_2 = v_wdata_i[VLEN*3-1 -: VLEN];
                         v_wdata_3 = v_wdata_i[VLEN*4-1 -: VLEN];
                 end
+                default: begin end
             endcase
         end else begin
             case (vsew_i)
-                2'd0: // 8b
+                3'd0: begin // 8b
                     v_wdata_0 = {
                         v_wdata_i[103:96],
                         v_wdata_i[71:64],
                         v_wdata_i[39:32],
                         v_wdata_i[7:0]
                     };
-                2'd1: // 16b
-                begin
+                end
+                3'd1: begin //16b
                     v_wdata_1 = {
                         v_wdata_i[111:96],
                         v_wdata_i[79:64]
@@ -257,12 +264,13 @@ module ibex_register_file_vector (
                         v_wdata_i[15:0]
                     };
                 end
-                2'd2: // 32b
-                begin
+                3'd2: begin //32b
                     v_wdata_3 = v_wdata_i[127:96];
                     v_wdata_2 = v_wdata_i[95:64];
                     v_wdata_1 = v_wdata_i[63:32];
                     v_wdata_0 = v_wdata_i[31:0];
+                end
+                default: begin
                 end
             endcase
         end
@@ -270,8 +278,8 @@ module ibex_register_file_vector (
     
     // Output Data Reading
     always_comb begin
-        unique case (vsew_i)
-            2'b00: begin // 8b
+        case (vsew_i)
+            3'b000: begin // 8b
                 v_rdata_a_o = {
                     {24{1'b0}},
                     v_rdata_a_0[31:24],
@@ -286,7 +294,7 @@ module ibex_register_file_vector (
                     {24{1'b0}},
                     v_rdata_b_0[31:24],
                     {24{1'b0}},
-                    v_rdata_b_o[23:16],
+                    v_rdata_b_0[23:16],
                     {24{1'b0}},
                     v_rdata_b_0[15:8],
                     {24{1'b0}},
@@ -302,7 +310,7 @@ module ibex_register_file_vector (
                     {24{1'b0}},
                     v_rdata_c_0[7:0] };
             end
-            2'b01: begin // 16b
+            3'b001: begin // 16b
                 v_rdata_a_o = {
                     {16{1'b0}},
                     v_rdata_a_1[31:16],
@@ -333,7 +341,7 @@ module ibex_register_file_vector (
                     {16{1'b0}},
                     v_rdata_c_0[15:0] };
             end
-            2'b10: begin // 32b
+            3'b010: begin // 32b
                 v_rdata_a_o = {
                     v_rdata_a_3,
                     v_rdata_a_2,
@@ -365,20 +373,20 @@ module ibex_register_file_vector (
     // Address Computation
     // TODO: figure out address computation...
     always_comb begin
-        v_raddr_a_0 =  v_raddr_a;
-        v_raddr_a_1 = {v_raddr_a[4:1], 1'b1};
-        v_raddr_a_2 = {v_raddr_a[4:2], 1'b1, v_raddr_a[0]};
-        v_raddr_a_3 = {v_raddr_a[4:2], 2'b11};
+        v_raddr_a_0 =  v_raddr_a_i;
+        v_raddr_a_1 = {v_raddr_a_i[4:1], 1'b1};
+        v_raddr_a_2 = {v_raddr_a_i[4:2], 1'b1, v_raddr_a_i[0]};
+        v_raddr_a_3 = {v_raddr_a_i[4:2], 2'b11};
 
-        v_raddr_b_0 =  v_raddr_b;
-        v_raddr_b_1 = {v_raddr_b[4:1], 1'b1};
-        v_raddr_b_2 = {v_raddr_b[4:2], 1'b1, v_raddr_b[0]};
-        v_raddr_b_3 = {v_raddr_b[4:2], 2'b11};
+        v_raddr_b_0 =  v_raddr_b_i;
+        v_raddr_b_1 = {v_raddr_b_i[4:1], 1'b1};
+        v_raddr_b_2 = {v_raddr_b_i[4:2], 1'b1, v_raddr_b_i[0]};
+        v_raddr_b_3 = {v_raddr_b_i[4:2], 2'b11};
 
-        v_waddr_c_0 =  v_waddr_i;
-        v_waddr_c_1 = {v_raddr_i[4:1], 1'b1};
-        v_waddr_c_2 = {v_raddr_i[4:2], 1'b1, v_waddr_i[0]};
-        v_waddr_c_3 = {v_raddr_i[4:2], 2'b11};
+        v_waddr_0 =  v_waddr_i;
+        v_waddr_1 = {v_waddr_i[4:1], 1'b1};
+        v_waddr_2 = {v_waddr_i[4:2], 1'b1, v_waddr_i[0]};
+        v_waddr_3 = {v_waddr_i[4:2], 2'b11};
     
     
     end
