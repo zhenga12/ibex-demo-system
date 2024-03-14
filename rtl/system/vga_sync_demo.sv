@@ -33,7 +33,7 @@ module vga_sync_demo
    logic [CD-1:0] rgb_reg;  
 
    // body 
-   // mod-4 counter to generate 25M-Hz tick
+   // mod-2 counter to generate 25M-Hz tick
    always_ff @(posedge clk)
       q_reg <= ~q_reg;
    assign tick_25M = (q_reg) ? 1 : 0;

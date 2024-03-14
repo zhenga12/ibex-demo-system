@@ -356,7 +356,7 @@ module ibex_demo_system #(
 
   vga_demo vga_check (
     .clk (clk_sys_i),
-    .sw (gp_i[3:0]),
+    .sw (gp_i[7:4]),
     .hsync (gp_o[12]),
     .vsync (gp_o[13]),
     .rgb (gp_o[11:0])
