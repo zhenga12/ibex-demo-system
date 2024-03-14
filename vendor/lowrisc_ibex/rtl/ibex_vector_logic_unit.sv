@@ -63,24 +63,24 @@ always_comb
 begin
 	if (1'b1)
 	case (vl_top[1:0])
-		2'd0:
+		3'd0:
 			result_o_RGB_imd = MAC_output_9 + MAC_output_8 + MAC_output_7 + MAC_output_6 + MAC_output_5+ MAC_output_4 + MAC_output_3 + MAC_output_2 +MAC_output_1;
-		2'd1:
-			result_o_RGB_imd = {'0, MAC_output_2};
-		2'd2:
-			result_o_RGB_imd = {'0, MAC_output_3};
-		2'd3:
-			result_o_RGB_imd = {'0, MAC_output_4};
-		2'd4:
-			result_o_RGB_imd = {'0, MAC_output_5};
-		2'd5:
-			result_o_RGB_imd = {'0, MAC_output_6};
-		2'd6:
-			result_o_RGB_imd = {'0, MAC_output_7};
-		2'd7:
-			result_o_RGB_imd = {'0, MAC_output_8};
+		3'd1:
+			result_o_RGB_imd = MAC_output_2;
+		3'd2:
+			result_o_RGB_imd = MAC_output_3;
+		3'd3:
+			result_o_RGB_imd = MAC_output_4;
+		3'd4:
+			result_o_RGB_imd = MAC_output_5;
+		3'd5:
+			result_o_RGB_imd = MAC_output_6;
+		3'd6:
+			result_o_RGB_imd = MAC_output_7;
+		3'd7:
+			result_o_RGB_imd = MAC_output_8;
 		default:
-			result_o_RGB_imd = {'0, MAC_output_9};
+			result_o_RGB_imd = MAC_output_9;
 	endcase
    else result_o_RGB_imd = MAC_output_9 + MAC_output_8 + MAC_output_7 + MAC_output_6 + MAC_output_5+ MAC_output_4 + MAC_output_3 + MAC_output_2 +MAC_output_1;
 	 //else result_o = {MAC_output_2, MAC_output_1};
