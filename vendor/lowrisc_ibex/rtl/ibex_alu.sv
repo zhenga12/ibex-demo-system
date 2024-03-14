@@ -56,6 +56,21 @@ module ibex_alu #(
     vector_result = 32'd1;
   end
 
+  ibex_vector_logic_unit vlu (
+    .vector_reg_1(),               
+    .vector_reg_2(),
+    .vector_reg_3(),
+    .vsew_top(),
+    .vl_top(),
+      	
+    .operator_i_top(),
+    .ADD_en_top(),
+    .SUB_en_top(),
+    .MULT_en_top(),
+    .custom_filt(),
+    .result_o_RGB(), 
+    .carry_out()
+);
 
   ///////////
   // Adder //

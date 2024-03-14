@@ -495,7 +495,7 @@ module ibex_top import ibex_pkg::*; #(
     // TODO: Connect wires to ALU and ID stage
     ibex_register_file_vector vector_register_file_i (
       .clk_i (clk),
-      .rst_ni(rst_ni),
+      .rstn_i(rst_ni),
       // VCSR
       .vsew_i(),
       .vlmul_i(),
@@ -503,7 +503,7 @@ module ibex_top import ibex_pkg::*; #(
       .v_wdata_i(),
       .v_waddr_i(),
       .v_we_i(),
-      .v_wnum(),
+      .v_wnum_i(),
       .v_load_en_i(),
       // Output data read
       .v_raddr_a_i(),

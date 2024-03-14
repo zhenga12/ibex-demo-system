@@ -17,4 +17,5 @@ ibex_register_file_ff.sv
 ibex_core.sv
 ibex_register_file_vector.sv
 ibex_vector_csr.sv
-ibex_vector_lsu.sv
+ibex_mac.sv
+ibex_vector_logic_unit.sv

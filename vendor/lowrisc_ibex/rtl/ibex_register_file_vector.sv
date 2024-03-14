@@ -5,7 +5,8 @@
  * Supporting VSEW: 8b, 16b, 32b
  * Supporting VLMUL: 1, 2, 4
  * Input: 128b
- * Ouptut: 3 x 128b
+ * Ouptut: 3 x 128b'
+ * Author: Loana Vo
  */
 
 module ibex_register_file_vector (
