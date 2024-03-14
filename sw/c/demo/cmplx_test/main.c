@@ -8,7 +8,7 @@
 static inline uint8_t cmplx_add_insn(uint32_t a, uint32_t b) {
   uint8_t result;
 
-  asm (".insn r CUSTOM_0, 1, 0, %0, %1, %2" :
+  asm (".insn r CUSTOM_0, 0, 0, %0, %1, %2" :
        "=r"(result) :
        "r"(a), "r"(b));
 
