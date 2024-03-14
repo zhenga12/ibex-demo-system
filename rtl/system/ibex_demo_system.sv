@@ -353,7 +353,7 @@ module ibex_demo_system #(
   //always_ff @(posedge clk_sys_i) begin
   //  gpio_reg_copy <= device_rdata[Gpio];
   //end
-
+/*
   vga_demo vga_check (
     .clk (clk_sys_i),
     .sw (gp_i[3:0]),
@@ -361,7 +361,17 @@ module ibex_demo_system #(
     .vsync (gp_o[13]),
     .rgb (gp_o[11:0])
   );
+*/
+logic[11:0] rgb_input = 12'hfff;
 
+  vga_sync_demo display_controller (
+    .clk (clk_sys_i),
+    .reset (rst_sys_ni),
+    .vga_si_rgb (rgb_input),
+    .hsync (gp_o[12]),
+    .vsync (gp_o[13]),
+    .rgb (gp_o[11:0])
+  );
   //always_ff @(posedge clk_sys_i) begin
   //  device_rdata[Gpio] <= gpio_reg_copy;
   //end
