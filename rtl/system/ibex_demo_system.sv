@@ -361,6 +361,7 @@ module ibex_demo_system #(
     .vsync (gp_o[13]),
     .rgb (gp_o[11:0])
   );
+
   //always_ff @(posedge clk_sys_i) begin
   //  device_rdata[Gpio] <= gpio_reg_copy;
   //end

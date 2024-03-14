@@ -6,9 +6,9 @@ module vga_sync_demo
     input  logic[CD-1:0] vga_si_rgb,
     // to vga monitor
     output logic hsync, vsync,
-    output logic[CD-1:0] rgb,
+    output logic[CD-1:0] rgb
     // frame counter output
-    output logic[10:0] hc, vc
+    //output logic[10:0] hc, vc
    );
 
    // localparam declaration
@@ -24,6 +24,7 @@ module vga_sync_demo
    localparam VR = 2;    // v. retrace
    localparam VT = VD+VF+VB+VR; // vertical total (525)
    // signal delaration
+   logic[10:0] hc, vc;
    logic [1:0] q_reg;
    logic tick_25M;
    logic[10:0] x, y;
@@ -34,8 +35,8 @@ module vga_sync_demo
    // body 
    // mod-4 counter to generate 25M-Hz tick
    always_ff @(posedge clk)
-      q_reg <= q_reg + 1;
-   assign tick_25M = (q_reg == 2'b11) ? 1 : 0;
+      q_reg <= ~q_reg;
+   assign tick_25M = (q_reg) ? 1 : 0;
    // instantiate frame counter
    frame_counter #(.HMAX(HT), .VMAX(VT)) frame_unit
       (.clk(clk), .reset(reset), 
