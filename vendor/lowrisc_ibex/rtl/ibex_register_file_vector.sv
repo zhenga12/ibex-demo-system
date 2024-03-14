@@ -39,14 +39,13 @@ module ibex_register_file_vector (
 
 );
   
-
     localparam VLEN = 32;
     localparam LEN  = 32;
 
     localparam VLMIN  = 8;
 
     // Vector Registers: v0 ... v31
-    logic [VLEN-1:0] vector_r [LEN-1:0];
+    reg [VLEN-1:0] vector_r [LEN-1:0];
 
     // Write Registers from Input Write Data 
     logic [VLEN-1:0] v_wdata_0;
@@ -92,9 +91,9 @@ module ibex_register_file_vector (
     logic [4:0] v_raddr_b_3;
 
 // Logic to Populate Register File
-    always_ff @(posedge clk_i, rstn_i) begin
+    always_ff @(posedge clk_i or negedge rstn_i) begin
         if(~rstn_i) begin
-            vector_r <= '{VLEN{'0}};
+            vector_r <= '{default: '0};
         end else begin
             if (v_we_i & (v_waddr_i != '0)) begin
                 // 128b input write data --> 4 groups of 32 bits
