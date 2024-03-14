@@ -56,10 +56,12 @@ module ibex_alu #(
     vector_result = 32'd1;
   end
 
+// 
+logic [7:0] c_out;
   ibex_vector_logic_unit vlu (
-    .vector_reg_1(operand_a_i),               
-    .vector_reg_2(operand_b_i),
-    .vector_reg_3(operand_a_i),
+    .vector_reg_1({96{operand_a_i[31],operand_a_i}}),               
+    .vector_reg_2({96{operand_b_i[31],operand_b_i}}),
+    .vector_reg_3({96{operand_a_i[31],operand_a_i}}),
     .vsew_top(1'b0),
     .vl_top(1'b0),
       	
@@ -69,7 +71,7 @@ module ibex_alu #(
     .MULT_en_top(1'b1),
     .custom_filt(1'b1),
     .result_o_RGB(vector_result), 
-    .carry_out()
+    .carry_out(c_out)
 );
 
   ///////////
