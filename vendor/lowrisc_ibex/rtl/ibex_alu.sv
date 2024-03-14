@@ -50,25 +50,25 @@ module ibex_alu #(
   // Vector Unit //
   /////////////////
   // TODO: Add VPU Arith Unit here
-  logic [31:0] vector_result;
+  logic [7:0] vector_result;
   
   always_comb begin
     vector_result = 32'd1;
   end
 
   ibex_vector_logic_unit vlu (
-    .vector_reg_1(),               
-    .vector_reg_2(),
-    .vector_reg_3(),
-    .vsew_top(),
-    .vl_top(),
+    .vector_reg_1(operand_a_i),               
+    .vector_reg_2(operand_b_i),
+    .vector_reg_3(operand_a_i),
+    .vsew_top(1'b0),
+    .vl_top(1'b0),
       	
-    .operator_i_top(),
-    .ADD_en_top(),
-    .SUB_en_top(),
-    .MULT_en_top(),
-    .custom_filt(),
-    .result_o_RGB(), 
+    .operator_i_top(3'b010),
+    .ADD_en_top(1'b1),
+    .SUB_en_top(1'b1),
+    .MULT_en_top(1'b1),
+    .custom_filt(1'b1),
+    .result_o_RGB(vector_result), 
     .carry_out()
 );
 
@@ -1351,7 +1351,8 @@ module ibex_alu #(
     result_o   = '0;
 
     unique case (operator_i)
-      VDOTVV, VADDVV, VMULVV: result_o = vector_result;
+    // Sign Extenstion, Not needed though.
+      VDOTVV, VADDVV, VMULVV: result_o = {24{vector_result[7],vector_result}};
 
       // Bitwise Logic Operations (negate: RV32B)
       ALU_XOR,  ALU_XNOR,
