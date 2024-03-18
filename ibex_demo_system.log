@@ -1,0 +1,25 @@
+Add test failed: 00000000
+C1
+00002000
+00000000
+
+C2
+00003000
+00000000
+
+C1 Packed
+20000000
+
+C2 Packed
+30000000
+
+Result (from soft cmplx)
+00005000
+00000000
+
+Result Packed (from hard cmplx insn)
+00000000
+
+
+
+00000001 failures seen
