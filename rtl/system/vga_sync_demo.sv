@@ -1,4 +1,4 @@
-module vga_sync_demo 
+module vga_sync_demo
    #(parameter CD= 12,
    parameter int unsigned GpiWidth  = 8,
    parameter int unsigned GpoWidth  = 16,
@@ -48,6 +48,8 @@ module vga_sync_demo
    localparam VR = 2;    // v. retrace
    localparam VT = VD+VF+VB+VR; // vertical total (525)
    // signal delaration
+   logic [CD-1:0] rgb_buffer;
+
    /* verilator lint_off UNUSED */
    logic[10:0] hc, vc;
    /* verilator lint_on UNUSED */
@@ -55,12 +57,8 @@ module vga_sync_demo
    logic tick_25M;
    logic[10:0] x, y;
    logic hsync_i, vsync_i, video_on_i;
-   logic hsync_reg, vsync_reg;  
-   logic [CD-1:0] rgb_reg;  
-
-   //assign x = vga_data[10:0];
-   //assign y = vga_data[21:11];
-
+   logic hsync_reg, vsync_reg;
+   logic [CD-1:0] rgb_reg;
 
    gpio #(
     .GpiWidth ( GpiWidth ),
@@ -80,15 +78,25 @@ module vga_sync_demo
     .gp_i (),
     .gp_o ()
   );
-   // body 
+
+
+   assign x = device_wdata_i[10:0];
+   assign y = device_wdata_i[21:11];
+   
+   
+   // body
    // mod-2 counter to generate 25M-Hz tick
-   always_ff @(posedge clk)
+   always_ff @(posedge clk) begin
       q_reg <= ~q_reg;
+      //to store colour after writing signal
+      if (device_we_i)
+         rgb_buffer <= device_wdata_i[11:0];
+   end
    assign tick_25M = (q_reg) ? 1 : 0;
    // instantiate frame counter
    frame_counter #(.HMAX(HT), .VMAX(VT)) frame_unit
-      (.clk(clk), .reset(reset), 
-       .sync_clr(0), .hcount(x), .vcount(y), .inc(tick_25M), 
+      (.clk(clk), .reset(reset),
+       .sync_clr(0), .hcount(x), .vcount(y), .inc(tick_25M),
        .frame_start(), .frame_end());
    // horizontal sync decoding
    assign hsync_i = ((x>=(HD+HF)) && (x<=(HD+HF+HR-1))) ? 0 : 1;
@@ -101,11 +109,11 @@ module vga_sync_demo
       vsync_reg <= vsync_i;
       hsync_reg <= hsync_i;
       if (video_on_i)
-         rgb_reg <= vga_si_rgb;
+         rgb_reg <= rgb_buffer;//12'hf00;//vga_si_rgb;
       else
-         rgb_reg <= 0;    // black when display off 
+         rgb_reg <= 0;    // black when display off
    end
-   // output 
+   // output
    assign hsync = hsync_reg;
    assign vsync = vsync_reg;
    assign rgb = rgb_reg;
