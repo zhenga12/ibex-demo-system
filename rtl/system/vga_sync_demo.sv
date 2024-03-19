@@ -1,14 +1,38 @@
 module vga_sync_demo 
-   #(parameter CD= 12)    // color depth
+   #(parameter CD= 12,
+   parameter int unsigned GpiWidth  = 8,
+   parameter int unsigned GpoWidth  = 16,
+   parameter int unsigned AddrWidth = 32,
+   parameter int unsigned DataWidth = 32,
+   parameter int unsigned RegAddr   = 12)    // color depth
    (
     input  logic clk, reset,
     // stream input
     input  logic[CD-1:0] vga_si_rgb,
     // to vga monitor
     output logic hsync, vsync,
-    output logic[CD-1:0] rgb
+    output logic[CD-1:0] rgb,
     // frame counter output
     //output logic[10:0] hc, vc
+
+    //for gpio
+    //input  logic clk_i,
+   //input  logic rst_ni,
+
+   input  logic                 device_req_i,
+   input  logic [AddrWidth-1:0] device_addr_i,
+   input  logic                 device_we_i,
+   input  logic [3:0]           device_be_i,
+   input  logic [DataWidth-1:0] device_wdata_i,
+   output logic                 device_rvalid_o,
+   output logic [DataWidth-1:0] device_rdata_o,
+
+/* verilator lint_off UNUSED */
+   input  logic [GpiWidth-1:0] gp_i,
+/* verilator lint_on UNUSED */
+
+   output logic [GpoWidth-1:0] gp_o
+
    );
 
    // localparam declaration
@@ -24,7 +48,9 @@ module vga_sync_demo
    localparam VR = 2;    // v. retrace
    localparam VT = VD+VF+VB+VR; // vertical total (525)
    // signal delaration
+   /* verilator lint_off UNUSED */
    logic[10:0] hc, vc;
+   /* verilator lint_on UNUSED */
    logic [1:0] q_reg;
    logic tick_25M;
    logic[10:0] x, y;
@@ -32,8 +58,30 @@ module vga_sync_demo
    logic hsync_reg, vsync_reg;  
    logic [CD-1:0] rgb_reg;  
 
+   //assign x = vga_data[10:0];
+   //assign y = vga_data[21:11];
+
+
+   gpio #(
+    .GpiWidth ( GpiWidth ),
+    .GpoWidth ( GpoWidth )
+   ) vga_gpio (
+    .clk_i (clk),
+    .rst_ni(reset),
+
+    .device_req_i   (device_req_i),
+    .device_addr_i  (device_addr_i),
+    .device_we_i    (device_we_i),
+    .device_be_i    (device_be_i),
+    .device_wdata_i (device_wdata_i),
+    .device_rvalid_o(device_rvalid_o),
+    .device_rdata_o (device_rdata_o),
+
+    .gp_i (),
+    .gp_o ()
+  );
    // body 
-   // mod-4 counter to generate 25M-Hz tick
+   // mod-2 counter to generate 25M-Hz tick
    always_ff @(posedge clk)
       q_reg <= ~q_reg;
    assign tick_25M = (q_reg) ? 1 : 0;

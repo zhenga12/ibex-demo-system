@@ -324,7 +324,7 @@ module ibex_demo_system #(
     .b_rvalid_o(),
     .b_rdata_o (mem_instr_rdata)
   );
-/*
+
   gpio #(
     .GpiWidth ( GpiWidth ),
     .GpoWidth ( GpoWidth )
@@ -341,9 +341,9 @@ module ibex_demo_system #(
     .device_rdata_o (device_rdata[Gpio]),
 
     .gp_i,
-    .gp_o
+    .gp_o ()
   );
-*/
+
 
 /* verilator lint_off UNUSED */
   logic [31:0] hc, vc;
@@ -370,7 +370,22 @@ logic[11:0] rgb_input = 12'hfff;
     .vga_si_rgb (rgb_input),
     .hsync (gp_o[12]),
     .vsync (gp_o[13]),
-    .rgb (gp_o[11:0])
+    .rgb (gp_o[11:0]),
+
+    //inputs for gpio control
+    //.clk_i (clk_sys_i),
+    //.rst_ni(rst_sys_ni),
+
+    .device_req_i   (device_req[Vga]),
+    .device_addr_i  (device_addr[Vga]),
+    .device_we_i    (device_we[Vga]),
+    .device_be_i    (device_be[Vga]),
+    .device_wdata_i (device_wdata[Vga]),
+    .device_rvalid_o(device_rvalid[Vga]),
+    .device_rdata_o (device_rdata[Vga]),
+
+    .gp_i (),
+    .gp_o ()
   );
   //always_ff @(posedge clk_sys_i) begin
   //  device_rdata[Gpio] <= gpio_reg_copy;

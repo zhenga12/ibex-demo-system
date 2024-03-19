@@ -22,7 +22,7 @@ filesets:
       - rtl/system/spi_top.sv
       - rtl/system/vga_sync_demo.sv
       - rtl/system/frame_counter.sv
-      - rtl/system/vga_demo.sv
+      #- rtl/system/vga_demo.sv
       - rtl/system/bar_demo.sv
       - rtl/system/rgb2gray.sv
     file_type: systemVerilogSource
