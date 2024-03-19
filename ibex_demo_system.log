@@ -1,0 +1,21 @@
+C1
+00000003
+00000000
+
+C2
+00000002
+00000000
+
+C1 Packed
+00030000
+
+C2 Packed
+00020000
+
+Result (from soft cmplx)
+00000005
+00000000
+
+Result Packed (from hard cmplx insn)
+00000000
+

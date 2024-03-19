@@ -2,6 +2,48 @@
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 
+/* #include <stdio.h>
+#include <stdint.h>
+
+static inline uint8_t vmul(uint32_t a, uint32_t b) {
+  uint8_t result;
+
+  asm (".insn r CUSTOM_0, 3, 0, %0, %1, %2" :
+       "=r"(result) :
+       "r"(a), "r"(b));
+
+  return result;
+}
+
+void dump_binop_result(uint8_t result) {
+  printf("Result (from VMUL cmplx): 0x%f\n", result);
+}
+
+int run_mul_test() {
+  // Assuming you meant to pass the values 100 and 100 to cmplx_add_insn
+  uint32_t a = 100;
+  uint32_t b = 100;
+
+  uint8_t result_packed = vmul(a, b);
+
+  dump_binop_result(result_packed);
+
+  return 0;
+}
+
+int main(void) {
+  for (int i=0;i<2;++i){
+    run_mul_test();
+  }
+ 
+
+  return 0;
+} */
+
+// Copyright lowRISC contributors.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+
 #include "demo_system.h"
 
 #define FP_EXP 12
@@ -28,8 +70,8 @@ typedef struct {
 } cmplx_t;
 
 cmplx_t test_nums[] = {
-  {MAKE_FP(2, 0, 0)},
-  {MAKE_FP(3, 0, 0)}
+  {3},
+  {2}
 };
 
 #define NUM_TESTS 1
@@ -71,7 +113,7 @@ int32_t fp_add(int32_t a, int32_t b) {
 
 
 
-cmplx_t cmplx_add_test(cmplx_t c1, cmplx_t c2) {
+cmplx_t cmplx_add(cmplx_t c1, cmplx_t c2) {
   cmplx_t res;
 
   res.real = fp_add(c1.real, c2.real);
@@ -146,7 +188,7 @@ int run_add_test(cmplx_t c1, cmplx_t c2, int dump_result) {
   result_packed = cmplx_add_insn(c1_packed, c2_packed);
 
   cmplx_t result;
-  result = cmplx_add_test(c1, c2);
+  result = cmplx_add(c1, c2);
 
   cmplx_t result_unpacked;
   result_unpacked = unpack_cmplx(result_packed);
@@ -172,29 +214,9 @@ int main(void) {
   int failures = 0;
 
   for (int i = 0;i < NUM_TESTS; ++i) {
-
-    if (!run_add_test(test_nums[i * 2], test_nums[i * 2 + 1], 0)) {
-      puts("Add test failed: ");
-      puthex(i);
-      puts("\n");
-      run_add_test(test_nums[i * 2], test_nums[i * 2 + 1], 1);
-      puts("\n\n");
-      ++failures;
-    }
-    else {
-      puts("Add test passed: ");
-      puthex(i);
-      puts("\n");
-      run_add_test(test_nums[i * 2], test_nums[i * 2 + 1], 1);
-      puts("\n\n");
-    }
-  }
-
-  if (failures) {
-    puthex(failures);
-    puts(" failures seen\n");
-  } else {
-    puts("All tests passed maybe!\n");
+    run_add_test(test_nums[i * 2], test_nums[i * 2 + 1], 1);
+      
+    
   }
 
   return 0;

@@ -2,7 +2,7 @@ make fuse:
 	fusesoc --cores-root=. run --target=sim --tool=verilator         --setup --build lowrisc:ibex:demo_system
 
 make buil:
-	./build/lowrisc_ibex_demo_system_0/sim-verilator/Vibex_demo_system \ -t --meminit=ram,/home/gajjarv/Capstone/Ibex_Core/ibex-demo-system/sw/c/build/demo/cmplx_test/cmplx_test
+	./build/lowrisc_ibex_demo_system_0/sim-verilator/Vibex_demo_system  -t --meminit=ram,/home/gajjarv/Capstone/Ibex_Core/ibex-demo-system/sw/c/build/demo/cmplx_test/cmplx_test
 
 
 make run_dis:

@@ -55,7 +55,7 @@ begin
 	result_o_RGB = result_o_RGB_imd [7:0];
 	// checks for >255 of <0
 	if (|result_o_RGB_imd[15:8]) result_o_RGB = 8'd255;
-	if (&result_o_RGB_imd[15:8]) result_o_RGB = 8'd 0;
+	if (&result_o_RGB_imd[15:8]) result_o_RGB = 8'd0;
 	
 end
 
