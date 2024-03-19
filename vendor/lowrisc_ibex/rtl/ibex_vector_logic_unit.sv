@@ -267,8 +267,9 @@ always_comb begin
 	mac_1_filter= 8'd5; 
 	mac_2_filter= -8'd1;
 	mac_3_filter= -8'd1; 
-	mac_4_filter= -8'd1; 
-	mac_5_filter= -8'd1; 
+	mac_4_filter= -8'd1;
+	// updated to account for only 32 bits, top bits were being misset 
+	mac_5_filter= 8'sd0; 
 	mac_6_filter= 8'sd0; 
 	mac_7_filter= 8'sd0; 
 	mac_8_filter= 8'sd0; 

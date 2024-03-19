@@ -1,21 +1,20 @@
-C1
-00000003
-00000000
-
-C2
-00000002
-00000000
-
-C1 Packed
-00030000
-
-C2 Packed
-00020000
-
-Result (from soft cmplx)
+Pixel
 00000005
+Pixel
+00000032
+Pixel
+000000FF
+Pixel
 00000000
-
-Result Packed (from hard cmplx insn)
-00000000
-
+Pixel
+00000029
+Pixel
+000000FF
+Pixel
+000000EF
+Pixel
+000000FF
+Pixel
+00000025
+Pixel
+00000061
