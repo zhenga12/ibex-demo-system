@@ -1,9 +1,9 @@
-Cycles,11694
-Instructions Retired,7001
-LSU Busy,3390
-Fetch Wait,367
-Loads,2056
-Stores,1334
-Jumps,698
-Conditional Branches,370
-Taken Conditional Branches,238
+Cycles,530848
+Instructions Retired,267883
+LSU Busy,107783
+Fetch Wait,102702
+Loads,105445
+Stores,2338
+Jumps,1200
+Conditional Branches,51688
+Taken Conditional Branches,51280

@@ -71,7 +71,7 @@ int32_t fp_add(int32_t a, int32_t b) {
 
 
 
-cmplx_t cmplx_add(cmplx_t c1, cmplx_t c2) {
+cmplx_t cmplx_add_test(cmplx_t c1, cmplx_t c2) {
   cmplx_t res;
 
   res.real = fp_add(c1.real, c2.real);
@@ -146,7 +146,7 @@ int run_add_test(cmplx_t c1, cmplx_t c2, int dump_result) {
   result_packed = cmplx_add_insn(c1_packed, c2_packed);
 
   cmplx_t result;
-  result = cmplx_add(c1, c2);
+  result = cmplx_add_test(c1, c2);
 
   cmplx_t result_unpacked;
   result_unpacked = unpack_cmplx(result_packed);
