@@ -13,7 +13,7 @@ module vga_sync_demo
     output logic hsync, vsync,
     output logic[CD-1:0] rgb,
     // frame counter output
-    //output logic[10:0] hc, vc
+    output logic[10:0] hc, vc,
 
     //for gpio
     //input  logic clk_i,
@@ -32,7 +32,6 @@ module vga_sync_demo
 /* verilator lint_on UNUSED */
 
    output logic [GpoWidth-1:0] gp_o
-
    );
 
    // localparam declaration
@@ -49,10 +48,6 @@ module vga_sync_demo
    localparam VT = VD+VF+VB+VR; // vertical total (525)
    // signal delaration
    logic [CD-1:0] rgb_buffer;
-
-   /* verilator lint_off UNUSED */
-   logic[10:0] hc, vc;
-   /* verilator lint_on UNUSED */
    logic [1:0] q_reg;
    logic tick_25M;
    logic[10:0] x, y;
@@ -79,16 +74,11 @@ module vga_sync_demo
     .gp_o ()
   );
 
-
-   assign x = device_wdata_i[10:0];
-   assign y = device_wdata_i[21:11];
-   
-   
    // body
    // mod-2 counter to generate 25M-Hz tick
    always_ff @(posedge clk) begin
       q_reg <= ~q_reg;
-      //to store colour after writing signal
+      //to store colour data after writing signal
       if (device_we_i)
          rgb_buffer <= device_wdata_i[11:0];
    end
@@ -111,7 +101,7 @@ module vga_sync_demo
       if (video_on_i)
          rgb_reg <= rgb_buffer;//12'hf00;//vga_si_rgb;
       else
-         rgb_reg <= 0;    // black when display off
+         rgb_reg <= 12'hf00;    // black when display off
    end
    // output
    assign hsync = hsync_reg;
