@@ -6,9 +6,9 @@ module vga_sync_demo
     input  logic[CD-1:0] vga_si_rgb,
     // to vga monitor
     output logic hsync, vsync,
-    output logic[CD-1:0] rgb
+    output logic[CD-1:0] rgb,
     // frame counter output
-    //output logic[10:0] hc, vc
+    output logic[10:0] hc, vc
    );
 
    // localparam declaration
@@ -24,7 +24,6 @@ module vga_sync_demo
    localparam VR = 2;    // v. retrace
    localparam VT = VD+VF+VB+VR; // vertical total (525)
    // signal delaration
-   logic[10:0] hc, vc;
    logic [1:0] q_reg;
    logic tick_25M;
    logic[10:0] x, y;

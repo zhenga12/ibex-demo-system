@@ -362,16 +362,20 @@ module ibex_demo_system #(
     .rgb (gp_o[11:0])
   );
 */
+
 logic[11:0] rgb_input = 12'hfff;
 
   vga_sync_demo display_controller (
     .clk (clk_sys_i),
-    .reset (rst_sys_ni),
+    .reset (~rst_sys_ni),
     .vga_si_rgb (rgb_input),
     .hsync (gp_o[12]),
     .vsync (gp_o[13]),
-    .rgb (gp_o[11:0])
+    .rgb (gp_o[11:0]),
+    .hc (),
+    .vc ()
   );
+
   //always_ff @(posedge clk_sys_i) begin
   //  device_rdata[Gpio] <= gpio_reg_copy;
   //end
