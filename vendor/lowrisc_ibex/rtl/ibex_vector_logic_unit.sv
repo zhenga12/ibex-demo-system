@@ -160,7 +160,7 @@ ibex_mac mac_4 (
 );
 ibex_mac mac_5 (
 		// Input Operands on X bits
-		.operand_a(vector_reg_1[39:32]),               
+		.operand_a(vector_reg_2[7:0]),               
 		.operand_b(mac_5_filter),
 		.carry_in(vector_reg_3[39:32]),
 
