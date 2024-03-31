@@ -74,12 +74,6 @@ typedef struct {
 
 
 
-
-
-
-
-
-
 void dump_binop_result(uint8_t result) {
   puts("Pixel\n");
   puthex(result);
