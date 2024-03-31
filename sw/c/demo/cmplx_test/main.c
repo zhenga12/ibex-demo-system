@@ -98,49 +98,71 @@ int run_vdot_test(uint32_t a, uint32_t b) {
 
 
 int main(void) {
-  int failures = 0;
+  //int failures = 0;
 
+  for (uint32_t i = 500; i <10000; i++)
+  { 
+    //500 = 0x1f4 
+    puts("using number (encoded as vector): ");
+    puthex(i);
+    puts("\n");
+    run_vdot_test(i,0); //0xf4*5 - 1 = 0x4c3 -> 255
+    puts("\n");
+  }
+  return 0;
+  
+  
   for (int i = 0;i < NUM_TESTS; i++) {
     uint32_t a = 1;
-    uint32_t b = 100;
-    run_vdot_test(a,b);
+    uint32_t b = 0; //dummy val [5,-1,-1,-1,-1]
+    run_vdot_test(a,b); //1*5 = 5
+    //returns 0x5
+
+    a = 10; //0xA
+    //b =0;
+    run_vdot_test(a,b); //10*5 = 50 = 0x32
+    //returns 0x32
+
+    a = 100; //0x64
+    //b =0;
+    run_vdot_test(a,b); //100*5 = 500 -> 255 = 0xff
+    //returns 0xff
+
+     a = 1000; //0x3 e8
+     //b =0; // -1  5   = 0x485 = 1157
+    run_vdot_test(a,b); 
+    //returns 0x0
 
 
-    a = 10;
-    b = 100;
-    run_vdot_test(a,b);
+     a = 10000; //0x27 10
+     //b =0;   // -1  5   =0x29
+    run_vdot_test(a,b);//10,000*5 = 0xc350
+    //returns 0x29
 
+     a = 100000; //0x1 86 a0
+     //b =0;    // -1 -1 5
+    run_vdot_test(a,b); //0x299 = 665 -> 255
+    //returns 0xff
+    
+     a = 1000000; //0xf 42 40
+     //b =0;     // -1 -1 5
+    run_vdot_test(a,b);//0xef = 239
+    //returns 0xef
 
-    a = 100;
-    b = 100;
-    run_vdot_test(a,b);
+     a = 10000000; //0x98 96 80
+     //b =0;      //  -1 -1 5
+    run_vdot_test(a,b); //0x152 = 338 -> 255
+    //returns 0xff
 
-     a = 1000;
-     b = 100;
-    run_vdot_test(a,b);
+     a = 100000000; //0x5 F5 E1 00
+     //b =0;      //  -1 -1 -1 5
+    run_vdot_test(a,b); //-1*0x1db = 0xfe25
+    //returns 0x25
 
-     a = 10000;
-     b = 100;
-    run_vdot_test(a,b);
-
-     a = 100000;
-     b = 100;
-    run_vdot_test(a,b);
-     a = 1000000;
-     b = 100;
-    run_vdot_test(a,b);
-
-     a = 10000000;
-     b = 100;
-    run_vdot_test(a,b);
-
-     a = 100000000;
-     b = 100;
-    run_vdot_test(a,b);
-
-     a = 1000000000;
-     b = 100;
-    run_vdot_test(a,b);
+     a = 1000000000; //0x3B 9A CA 00
+     //b = 0;        //  -1 -1 -1 5
+    run_vdot_test(a,b);//-1*0x19f = 0xfe61
+    //returns 0x61
   }
 
   return 0;
