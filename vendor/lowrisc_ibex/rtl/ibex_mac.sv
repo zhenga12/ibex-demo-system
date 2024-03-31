@@ -53,7 +53,8 @@ assign operator_i_decoded = operator_i;
 
 ////
 
-logic signed [7:0] multiplier_operand_a, multiplier_operand_b, adder_operand_a, adder_operand_b;
+logic signed [7:0]  multiplier_operand_b, adder_operand_a, adder_operand_b;
+logic signed [8:0] multiplier_operand_a;
 logic signed [15:0] multiplier_output, adder_output, MAC_output;
 
 // simple arithmetic stage - Doesn't consider Vector and Custom Filter setup.
@@ -66,7 +67,7 @@ logic signed [15:0] multiplier_output, adder_output, MAC_output;
 
     // Multiplier
    always_comb begin
-		multiplier_operand_a = operand_a;
+		multiplier_operand_a = {1'b0,operand_a};
 		multiplier_operand_b = operand_b;
 		multiplier_output = multiplier_operand_a * multiplier_operand_b;
 	end

@@ -1,27 +1,29 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Tue Feb 20 16:45:09 2024
+[*] Sun Mar 31 22:41:00 2024
 [*]
-[dumpfile] "/home/gajjarv/sim.fst"
-[dumpfile_mtime] "Tue Feb 20 06:31:40 2024"
-[dumpfile_size] 968393
-[savefile] "/home/gajjarv/gtkwave_signals.gtkw"
-[timestart] 15911
-[size] 1908 1047
-[pos] 32767 32767
-*-2.000000 15693 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[dumpfile] "/home/gajjarv/Capstone/Ibex_Core/ibex-demo-system/sim.fst"
+[dumpfile_mtime] "Sun Mar 31 22:23:28 2024"
+[dumpfile_size] 229627
+[savefile] "/home/gajjarv/Capstone/Ibex_Core/ibex-demo-system/gtkwave_signals.gtkw"
+[timestart] 309
+[size] 1908 999
+[pos] -500 -270
+*-2.000000 317 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.ibex_demo_system.
 [treeopen] TOP.ibex_demo_system.u_top.
 [treeopen] TOP.ibex_demo_system.u_top.u_ibex_core.
+[treeopen] TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.
+[treeopen] TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.
+[treeopen] TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.
 [treeopen] TOP.ibex_demo_system.u_top.u_ibex_core.id_stage_i.
 [treeopen] TOP.ibex_demo_system.u_top.u_ibex_core.id_stage_i.decoder_i.
 [treeopen] TOP.ibex_demo_system.u_top.u_ibex_core.if_stage_i.
-[treeopen] TOP.ibex_pkg.
 [sst_width] 459
-[signals_width] 629
+[signals_width] 583
 [sst_expanded] 1
-[sst_vpaned_height] 309
+[sst_vpaned_height] 596
 @100c00028
 TOP.ibex_demo_system.u_top.u_ibex_core.id_stage_i.decoder_i.alu_operator_o[6:0]
 @28
@@ -39,7 +41,7 @@ TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_result[31:0]
 TOP.ibex_demo_system.u_top.u_ibex_core.alu_operand_a_ex[31:0]
 @28
 TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.clk_i
-@800028
+@c00028
 TOP.ibex_demo_system.u_top.u_ibex_core.id_stage_i.decoder_i.instr_rdata_alu_i[31:0]
 @28
 (0)TOP.ibex_demo_system.u_top.u_ibex_core.id_stage_i.decoder_i.instr_rdata_alu_i[31:0]
@@ -74,7 +76,7 @@ TOP.ibex_demo_system.u_top.u_ibex_core.id_stage_i.decoder_i.instr_rdata_alu_i[31
 (29)TOP.ibex_demo_system.u_top.u_ibex_core.id_stage_i.decoder_i.instr_rdata_alu_i[31:0]
 (30)TOP.ibex_demo_system.u_top.u_ibex_core.id_stage_i.decoder_i.instr_rdata_alu_i[31:0]
 (31)TOP.ibex_demo_system.u_top.u_ibex_core.id_stage_i.decoder_i.instr_rdata_alu_i[31:0]
-@1001200
+@1401200
 -group_end
 @100000028
 TOP.ibex_demo_system.u_top.u_ibex_core.id_stage_i.decoder_i.opcode_alu[6:0]
@@ -88,7 +90,7 @@ TOP.ibex_demo_system.u_top.u_ibex_core.alu_operator_ex[6:0]
 TOP.ibex_demo_system.u_top.u_ibex_core.multdiv_operator_ex[1:0]
 @28
 TOP.ibex_demo_system.u_top.u_ibex_core.instr_addr_o[31:0]
-@800028
+@c00028
 TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
 @28
 (0)TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
@@ -102,9 +104,7 @@ TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
 (8)TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
 (9)TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
 (10)TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
-@29
 (11)TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
-@28
 (12)TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
 (13)TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
 (14)TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
@@ -125,9 +125,73 @@ TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
 (29)TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
 (30)TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
 (31)TOP.ibex_demo_system.u_top.u_ibex_core.instr_rdata_id[31:0]
-@1001200
+@1401200
 -group_end
 @28
 TOP.ibex_demo_system.u_top.u_ibex_core.if_stage_i.instr_rdata_id_o[31:0]
+@420
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_3.adder_operand_a[7:0]
+@22
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.vector_reg_1[127:0]
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.vector_reg_2[127:0]
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.MAC_output_1[15:0]
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.MAC_output_2[15:0]
+@c00022
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+@28
+(0)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(1)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(2)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(3)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(4)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(5)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(6)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(7)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(8)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(9)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(10)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(11)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(12)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(13)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(14)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+(15)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB_imd[15:0]
+@1401200
+-group_end
+@420
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.operand_a[7:0]
+@421
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.multiplier_operand_a[7:0]
+@22
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.operand_b[7:0]
+@800420
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+@28
+(0)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(1)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(2)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(3)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(4)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(5)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(6)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(7)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(8)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(9)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(10)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(11)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(12)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(13)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(14)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+(15)TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.result_o[15:0]
+@1001600
+-group_end
+@22
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_1.multiplier_output[15:0]
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.result_o_RGB[7:0]
+TOP.ibex_demo_system.u_top.u_ibex_core.ex_block_i.alu_i.vlu.mac_3.adder_operand_b[7:0]
 [pattern_trace] 1
 [pattern_trace] 0
+!100000@@
+?"VDOT
+@100c00029
+TOP.ibex_demo_system.u_top.u_ibex_core.id_stage_i.decoder_i.alu_operator_o[6:0]
+!!

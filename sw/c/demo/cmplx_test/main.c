@@ -74,12 +74,6 @@ typedef struct {
 
 
 
-
-
-
-
-
-
 void dump_binop_result(uint8_t result) {
   puts("Pixel\n");
   puthex(result);
@@ -101,11 +95,14 @@ int main(void) {
   int failures = 0;
 
   for (int i = 0;i < NUM_TESTS; i++) {
-    uint32_t a = 1;
+    uint32_t a = 7379; // 0x1CD3
     uint32_t b = 100;
     run_vdot_test(a,b);
 
-
+    a = 6149; // 0x1D05
+    b = 100;
+    run_vdot_test(a,b);
+  /*
     a = 10;
     b = 100;
     run_vdot_test(a,b);
@@ -141,6 +138,7 @@ int main(void) {
      a = 1000000000;
      b = 100;
     run_vdot_test(a,b);
+    */
   }
 
   return 0;
