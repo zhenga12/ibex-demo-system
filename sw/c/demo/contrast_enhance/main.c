@@ -56,7 +56,7 @@ uint8_t get_image_window(uint8_t* image, uint8_t* window, uint32_t window_length
         for(uint32_t mask_col=0; mask_col<window_length; mask_col++)
         {
             window[mask_row*window_length + mask_col]
-                = image[row*GREYSCALE_WIDTH+col];
+                = image[(row+mask_row)*GREYSCALE_WIDTH+(col+mask_col)];
         }
     }
     return 0;
@@ -68,9 +68,9 @@ uint8_t get_image_window(uint8_t* image, uint8_t* window, uint32_t window_length
 // 0  -1  0
 // -1  5  -1
 // 0  -1  0
-uint8_t apply_mask(int* mask, uint8_t* window, int mask_dim)
+int apply_mask(int* mask, uint8_t* window, int mask_dim)
 {
-    uint8_t val = 0;
+    int val = 0;
     //to match order that is to be done in hardware later
     val += mask[4]*window[4];
     val += mask[1]*window[1];
@@ -88,8 +88,8 @@ int log_vdot_values(uint32_t reg1, uint32_t reg2)
     puts("\nreg2: ");
     puthex(reg2);
     puts("\n");
-    return 0;
 #endif //LOG_REG_VALS
+    return 0;
 }
 
 //assembly instruction for vdot
@@ -142,7 +142,7 @@ int main(void)
         {
             int new_pixel = 0;
             uint8_t image_window[MASK_DIM*MASK_DIM] = {0};
-            get_image_window(greyscale, image_window, MASK_DIM, index_row, index_col);
+            get_image_window(greyscale, image_window, MASK_DIM, index_row-OFFSET, index_col-OFFSET);
             //dump_img_data(image_window, MASK_DIM, MASK_DIM);
 #if USE_RTL
             new_pixel = (int) hardware_vdot(image_window);
