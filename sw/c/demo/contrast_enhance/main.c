@@ -7,18 +7,18 @@
 
 
 //#include "image.h"
-#include "image_47x63.h"
-//#include "image_137x183.h"
+//#include "image_47x63.h"
+#include "image_137x183.h"
 
 #define MASK_DIM    3
 #define OFFSET      1 //offset due to 3x3 mask used for enhancement
-#define DUMP_PIXELS 1
+#define DUMP_PIXELS 0
 #define MEASURE_TIME 0
 #define MAX_PIXEL_VAL ((1 << 8) - 1)
 #define PRINT_DEBUG 0
 
 //use vector instructions that got implemented
-#define USE_RTL 0
+#define USE_RTL 1
 #define LOG_REG_VALS 0 //to log values being encoded for vdot
 
 #define WIDTH 400
@@ -64,48 +64,54 @@ static void timer_delay(uint32_t ms) {
 *Returns: Success (0)
 *
 */
-int setup_lcd(St7735Context* p_lcd_ctx)
+int setup_lcd(spi_t* p_spi, St7735Context* p_lcd_ctx, LCD_Interface* p_lcd_interface)
 {
     // Set the initial state of the LCD control pins.
     set_output_bit(GPIO_OUT, LcdDcPin, 0x0);
     set_output_bit(GPIO_OUT, LcdBlPin, 0x1);
     set_output_bit(GPIO_OUT, LcdCsPin, 0x0);
-
+    puts("setup_lcd - set initial state\n");
 
     // Init spi driver.
     spi_t spi;
-    spi_init(&spi, DEFAULT_SPI, SpiSpeedHz);
+    puts("setup_lcd - spi init\n");
+    spi_init(p_spi, DEFAULT_SPI, SpiSpeedHz);
 
     // Reset LCD.
+    puts("setup_lcd - lcd reset\n");
     set_output_bit(GPIO_OUT, LcdRstPin, 0x0);
     timer_delay(150);
     set_output_bit(GPIO_OUT, LcdRstPin, 0x1);
 
     LCD_Interface interface = {
-    .handle      = &spi,         // SPI handle.
+    .handle      = p_spi,         // SPI handle.
     .spi_write   = spi_write,    // SPI write callback.
     .gpio_write  = gpio_write,   // GPIO write callback.
     .timer_delay = timer_delay,  // Timer delay callback.
     };
-
-    lcd_st7735_init(p_lcd_ctx, &interface);
+    p_lcd_interface = &interface;
+    puts("setup_lcd - init\n");
+    lcd_st7735_init(p_lcd_ctx, p_lcd_interface);
 
     // Set the LCD orientation.
-    lcd_st7735_set_orientation(p_lcd_ctx, LCD_Rotate180);
+    lcd_st7735_set_orientation(p_lcd_ctx, LCD_Rotate0);
 
     // Setup text font bitmaps to be used and the colors.
+    puts("setup_lcd - set fonts\n");
     lcd_st7735_set_font(p_lcd_ctx, &lucidaConsole_10ptFont);
     lcd_st7735_set_font_colors(p_lcd_ctx, BGRColorWhite, BGRColorBlack);
 
     // Clean display with a white rectangle.
     lcd_st7735_clean(p_lcd_ctx);
 
+    puts("setup_lcd - send boot msg\n");
     // Draw the splash screen with a RGB 565 bitmap and text in the bottom.
     //lcd_st7735_draw_rgb565(p_lcd_ctx, (LCD_rectangle){.origin = {.x = (160 - 105) / 2, .y = 5}, .width = 105, .height = 80},
     //                        (uint8_t *)lowrisc_logo_105x80);
     lcd_println(p_lcd_ctx, "Booting...", alined_center, 7);
     timer_delay(1000);
-
+    puts("setup_lcd - clean screen\n");
+    lcd_st7735_clean(p_lcd_ctx);
     return 0;
 }
 
@@ -204,7 +210,7 @@ uint8_t hardware_vdot(uint8_t* window)
 
 int main(void)
 {
-    puts("started\n");
+    //puts("started\n");
     //char frame[WIDTH*HEIGHT] = {0};
 
     //test code to confirm functionality
@@ -222,24 +228,83 @@ int main(void)
                                                  0,-1,0};
     char enhanced_img[GREYSCALE_HEIGHT*GREYSCALE_WIDTH] = {0};
     timer_init();
-    timer_enable(50000000); //clock speed (50MHz?? based on values in clk_rst_if)
-    puts("timer init done\n");
+    //timer_enable(50000000); //clock speed (50MHz?? based on values in clk_rst_if)
+    //puts("timer init done\n");
     St7735Context lcd_ctx;
-    setup_lcd(&lcd_ctx);
+    //spi_t spi;
+    //LCD_Interface interface = {0};
+    puts("begin lcd init\n");
+    //setup_lcd(&spi, &lcd_ctx, &interface);
+        // Set the initial state of the LCD control pins.
+    set_output_bit(GPIO_OUT, LcdDcPin, 0x0);
+    set_output_bit(GPIO_OUT, LcdBlPin, 0x1);
+    set_output_bit(GPIO_OUT, LcdCsPin, 0x0);
+    //puts("setup_lcd - set initial state\n");
+
+    // Init spi driver.
+    spi_t spi;
+    //puts("setup_lcd - spi init\n");
+    spi_init(&spi, DEFAULT_SPI, SpiSpeedHz);
+
+    // Reset LCD.
+    //puts("setup_lcd - lcd reset\n");
+    set_output_bit(GPIO_OUT, LcdRstPin, 0x0);
+    timer_delay(150);
+    set_output_bit(GPIO_OUT, LcdRstPin, 0x1);
+
+    LCD_Interface interface = {
+    .handle      = &spi,         // SPI handle.
+    .spi_write   = spi_write,    // SPI write callback.
+    .gpio_write  = gpio_write,   // GPIO write callback.
+    .timer_delay = timer_delay,  // Timer delay callback.
+    };
+    //p_lcd_interface = &interface;
+    //puts("setup_lcd - init\n");
+    lcd_st7735_init(&lcd_ctx, &interface);
+
+    // Set the LCD orientation.
+    lcd_st7735_set_orientation(&lcd_ctx, LCD_Rotate90);
+
+    // Setup text font bitmaps to be used and the colors.
+    //puts("setup_lcd - set fonts\n");
+    lcd_st7735_set_font(&lcd_ctx, &lucidaConsole_10ptFont);
+    lcd_st7735_set_font_colors(&lcd_ctx, BGRColorWhite, BGRColorBlack);
+
+    // Clean display with a white rectangle.
+    lcd_st7735_clean(&lcd_ctx);
+
+    //puts("setup_lcd - send boot msg\n");
+    // Draw the splash screen with a RGB 565 bitmap and text in the bottom.
+    //lcd_st7735_draw_rgb565(p_lcd_ctx, (LCD_rectangle){.origin = {.x = (160 - 105) / 2, .y = 5}, .width = 105, .height = 80},
+    //                        (uint8_t *)lowrisc_logo_105x80);
+    lcd_println(&lcd_ctx, "Booting...", alined_center, 5);
+    timer_delay(1000);
+    //puts("setup_lcd - clean screen\n");
+    lcd_st7735_clean(&lcd_ctx);
+    lcd_st7735_set_orientation(&lcd_ctx, LCD_Rotate180);
     puts("lcd init done\n");
 
-    start_time = timer_read();
+    //LCD_rectangle rectangle = {.origin = {.x = 0, .y = 0}, .width = GREYSCALE_WIDTH, .height = GREYSCALE_HEIGHT};
+    //lcd_st7735_rgb565_start(&lcd_ctx, rectangle);
+    //start_time = timer_read();
+    while(1)
+    {
+      puts("starting process\n");
     for (uint32_t index_row=OFFSET; index_row<GREYSCALE_HEIGHT-1; index_row++)
     {
         for (uint32_t index_col=OFFSET; index_col<GREYSCALE_WIDTH-1; index_col++)
         {
+            //puts("begin kernel convolution\n");
             int new_pixel = 0;
             uint8_t image_window[MASK_DIM*MASK_DIM] = {0};
             get_image_window(greyscale, image_window, MASK_DIM, index_row-OFFSET, index_col-OFFSET);
+            //puts("got window\n");
             //dump_img_data(image_window, MASK_DIM, MASK_DIM);
 #if USE_RTL
+            //puts("using RTL\n");
             new_pixel = (int) hardware_vdot(image_window);
 #else //USE_RTL
+            //puts("using sw masks\n");
             new_pixel = apply_mask(ENHANCEMENT_MASK, image_window, MASK_DIM);
 
             //handle underflow/overflow when storing value with 8 bits
@@ -251,7 +316,19 @@ int main(void)
             enhanced_img[index_row*GREYSCALE_WIDTH + index_col] = new_pixel;
 
             //draw new pixel onto LCD 
-            lcd_st7735_draw_pixel(&lcd_ctx, (LCD_Point){.x = index_row , .y = index_col }, new_pixel);
+            //puts("drawing pixel\n");
+            new_pixel = new_pixel | (new_pixel<<8) | (new_pixel << 16);//set to 24bit value for writing to lcd
+            Result res = lcd_st7735_draw_pixel(&lcd_ctx, (LCD_Point){.x = index_row, .y = index_col}, new_pixel);
+            //timer_delay(1);
+            /*puts("result:");
+            puthex(res.code);
+            puts("\n coords: ");
+            puthex(index_row);
+            puts(" , ");
+            puthex(index_col);
+            puts("\n");
+            */
+            //lcd_st7735_rgb565_put(&lcd_ctx, enhanced_img, sizeof(enhanced_img));
 #if PRINT_DEBUG
             puts("done calculating pixel value: ");
             puthex(enhanced_img[index_row*GREYSCALE_WIDTH + index_col]);
@@ -275,7 +352,16 @@ int main(void)
 #endif //PRINT_DEBUG
         }
     }
-    end_time = timer_read();
+    timer_delay(1500);
+    lcd_st7735_clean(&lcd_ctx);
+    lcd_st7735_set_orientation(&lcd_ctx, LCD_Rotate90);
+    lcd_println(&lcd_ctx, "  Restarting...", alined_left, 5);
+    timer_delay(1500);
+    lcd_st7735_clean(&lcd_ctx);
+    lcd_st7735_set_orientation(&lcd_ctx, LCD_Rotate180);
+    timer_delay(100);
+    }
+    //end_time = timer_read();
 
     if (MEASURE_TIME)
     {
