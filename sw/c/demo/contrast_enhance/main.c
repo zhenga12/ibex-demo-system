@@ -1,5 +1,10 @@
 #include "demo_system.h"
 #include "timer.h"
+#include "core/lucida_console_10pt.h"
+#include "lcd.h"
+#include "spi.h"
+#include "st7735/lcd_st7735.h"
+
 
 //#include "image.h"
 #include "image_47x63.h"
@@ -13,7 +18,7 @@
 #define PRINT_DEBUG 0
 
 //use vector instructions that got implemented
-#define USE_RTL 1
+#define USE_RTL 0
 #define LOG_REG_VALS 0 //to log values being encoded for vdot
 
 #define WIDTH 400
@@ -21,6 +26,89 @@
 
 #define SET_REG1(x)  ( ((x[4]&0xFF) << 0) | ((x[1]&0xFF) << 8) | ((x[5]&0xFF) << 16) | ((x[7]&0xFF) << 24) )
 #define SET_REG2(x)  ( ((x[3]&0xFF) << 0) )
+
+static uint32_t spi_write(void *handle, uint8_t *data, size_t len) {
+  const uint32_t data_sent = len;
+  while (len--) {
+    spi_send_byte_blocking(handle, *data++);
+  }
+  while ((spi_get_status(handle) & spi_status_fifo_empty) != spi_status_fifo_empty)
+    ;
+  return data_sent;
+}
+
+static uint32_t gpio_write(void *handle, bool cs, bool dc) {
+  set_output_bit(GPIO_OUT, LcdDcPin, dc);
+  set_output_bit(GPIO_OUT, LcdCsPin, cs);
+  return 0;
+}
+
+static void timer_delay(uint32_t ms) {
+  // Configure timer to trigger every 1 ms
+  timer_enable(50000);
+  uint32_t timeout = get_elapsed_time() + ms;
+  while (get_elapsed_time() < timeout) {
+    asm volatile("wfi");
+  }
+  timer_disable();
+}
+
+
+/*startup for initializing LCD using st7735 drivers
+* Also initializes spi driver used to commmunicate with LCD
+*Inputs:
+*   p_spi:
+*   p_lcd_ctx:
+*Outputs:
+*   p_lcd_ctx: context used to control LCD
+*Returns: Success (0)
+*
+*/
+int setup_lcd(St7735Context* p_lcd_ctx)
+{
+    // Set the initial state of the LCD control pins.
+    set_output_bit(GPIO_OUT, LcdDcPin, 0x0);
+    set_output_bit(GPIO_OUT, LcdBlPin, 0x1);
+    set_output_bit(GPIO_OUT, LcdCsPin, 0x0);
+
+
+    // Init spi driver.
+    spi_t spi;
+    spi_init(&spi, DEFAULT_SPI, SpiSpeedHz);
+
+    // Reset LCD.
+    set_output_bit(GPIO_OUT, LcdRstPin, 0x0);
+    timer_delay(150);
+    set_output_bit(GPIO_OUT, LcdRstPin, 0x1);
+
+    LCD_Interface interface = {
+    .handle      = &spi,         // SPI handle.
+    .spi_write   = spi_write,    // SPI write callback.
+    .gpio_write  = gpio_write,   // GPIO write callback.
+    .timer_delay = timer_delay,  // Timer delay callback.
+    };
+
+    lcd_st7735_init(p_lcd_ctx, &interface);
+
+    // Set the LCD orientation.
+    lcd_st7735_set_orientation(p_lcd_ctx, LCD_Rotate180);
+
+    // Setup text font bitmaps to be used and the colors.
+    lcd_st7735_set_font(p_lcd_ctx, &lucidaConsole_10ptFont);
+    lcd_st7735_set_font_colors(p_lcd_ctx, BGRColorWhite, BGRColorBlack);
+
+    // Clean display with a white rectangle.
+    lcd_st7735_clean(p_lcd_ctx);
+
+    // Draw the splash screen with a RGB 565 bitmap and text in the bottom.
+    //lcd_st7735_draw_rgb565(p_lcd_ctx, (LCD_rectangle){.origin = {.x = (160 - 105) / 2, .y = 5}, .width = 105, .height = 80},
+    //                        (uint8_t *)lowrisc_logo_105x80);
+    lcd_println(p_lcd_ctx, "Booting...", alined_center, 7);
+    timer_delay(1000);
+
+    return 0;
+}
+
 /*
 *dumps out pixel data of the image into the log file
 *Inputs:
@@ -116,7 +204,7 @@ uint8_t hardware_vdot(uint8_t* window)
 
 int main(void)
 {
-    //puts("started\n");
+    puts("started\n");
     //char frame[WIDTH*HEIGHT] = {0};
 
     //test code to confirm functionality
@@ -135,6 +223,11 @@ int main(void)
     char enhanced_img[GREYSCALE_HEIGHT*GREYSCALE_WIDTH] = {0};
     timer_init();
     timer_enable(50000000); //clock speed (50MHz?? based on values in clk_rst_if)
+    puts("timer init done\n");
+    St7735Context lcd_ctx;
+    setup_lcd(&lcd_ctx);
+    puts("lcd init done\n");
+
     start_time = timer_read();
     for (uint32_t index_row=OFFSET; index_row<GREYSCALE_HEIGHT-1; index_row++)
     {
@@ -157,6 +250,8 @@ int main(void)
 #endif
             enhanced_img[index_row*GREYSCALE_WIDTH + index_col] = new_pixel;
 
+            //draw new pixel onto LCD 
+            lcd_st7735_draw_pixel(&lcd_ctx, (LCD_Point){.x = index_row , .y = index_col }, new_pixel);
 #if PRINT_DEBUG
             puts("done calculating pixel value: ");
             puthex(enhanced_img[index_row*GREYSCALE_WIDTH + index_col]);
